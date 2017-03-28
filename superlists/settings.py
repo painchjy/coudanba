@@ -25,7 +25,7 @@ SECRET_KEY = 't+*j#xzcb9)obo=+pvcscz$t4_ab2q)sgo!y51nakc97u799cx'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['superlists-staging.painchjy.top',]
 
 
 # Application definition
