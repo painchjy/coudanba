@@ -5,8 +5,8 @@
 {% block form_action %}{% url 'view_list' list.id %}{% endblock %}
 {% block table %}
 	<table id="id_list_table" class="table">
-	    {% for item in items %}
-		    <tr><td>{{forloop.counter}}:{{ item.text}}</td></tr>
+	    {% for item in list.item_set.all %}
+		    <tr><td>{{forloop.counter}}: {{ item.text}}</td></tr>
 	    {% endfor %}
 	</table>
 {% endblock %}

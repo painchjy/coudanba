@@ -23,11 +23,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 't+*j#xzcb9)obo=+pvcscz$t4_ab2q)sgo!y51nakc97u799cx'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-TEMPLATE_DEBUG = DEBUG
+#TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = ['superlists-staging.painchjy.top',]
+ALLOWED_HOSTS = ['superlists-staging.painchjy.top','localhost','127.0.0.1']
 
 
 # Application definition
@@ -60,6 +60,7 @@ TEMPLATES = [
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': True,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
