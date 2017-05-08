@@ -23,6 +23,27 @@ class ItemValidationTest(FunctionalTest):
         self.wait_for(lambda: self.assertFalse(
             self.get_error_element().is_displayed()
         ))
+       
+        #She try again to cause a duplication error
+        self.get_item_input_box().send_keys(Keys.ENTER)
+        self.wait_for(lambda: self.assertFalse(
+            self.get_error_element().is_displayed()
+        ))
+        self.wait_for_row_in_list_table('2: Banter too thicka')
+        self.get_item_input_box().send_keys('Banter too thicka')
+        self.get_item_input_box().send_keys(Keys.ENTER)
+
+        self.wait_for(lambda: self.assertTrue(
+            self.get_error_element().is_displayed()
+        ))
+
+        # She strarts to click the input box
+        self.get_item_input_box().click()
+
+        # She is pleased to see that the error message disappears again
+        self.wait_for(lambda: self.assertFalse(
+            self.get_error_element().is_displayed()
+        ))
         
     def test_cannot_add_duplicate_items(self):
         #Edith goes to the home page and starts a new list

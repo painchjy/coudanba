@@ -4,14 +4,15 @@
 	<meta charset="utf-8">
 	<meta name=viewport" content="width=device-width">
 	<title>Javascript tests</title>
+	<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../base.css" rel="stylesheet">
         <link rel="stylesheet" href="qunit-2.3.2.css">
 </head>
 <body>
 	<div id="qunit"></div>
 	<div id="qunit-fixture">
 	<form>
-		<input name="text" />
-	        <div class="has-error">Error text</div>
+		<input name="text" class="form-control input-lg"/>
 	        <div class="has-error">Error text</div>
 	</form>
 	</div>
@@ -20,13 +21,18 @@
 	<script src="qunit-2.3.2.js"></script>
 	<script>
 		QUnit.test("errors should be hidden on keypress", function (assert) {
-			initialize();
+			window.Superlists.initialize();
 			$('input[name="text"]').trigger('keypress');
 			assert.equal($('.has-error').is(':visible'), false);
 		});
 		QUnit.test("errors aren't hidden if there is no keypress", function (assert) {
-			initialize();
+			window.Superlists.initialize();
 			assert.equal($('.has-error').is(':visible'), true);
+		});
+		QUnit.test("errors should be hidden on click", function (assert) {
+			window.Superlists.initialize();
+			$('input[name="text"]').trigger('click');
+			assert.equal($('.has-error').is(':visible'), false);
 		});
 
 	</script>
