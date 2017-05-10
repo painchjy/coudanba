@@ -60,13 +60,18 @@ def _update_database(source_folder):
         ' && ../virtualenv/bin/python manage.py migrate --noinput'
     )
 def _config_nginx_gunicorn(source_folder, site_name):
-    sudo(f'sed "s/SITENAME/{site_name}/g" '
-        f' {source_folder}/deploy_tools/nginx.template.conf | tee'
-        f' /etc/nginx/sites-available/{site_name}'
-        f' && ln -s /etc/nginx/sites-available/{site_name}'
-        f' /etc/nginx/sites-enabled/{site_name}'
-        f' && sed "s/SITENAME/{site_name}/g"'
-        f' {source_folder}/deploy_tools/gunicorn-systemd.template.service | tee'
-        f' /etc/systemd/system/gunicorn-{site_name}.service'
-    )
+    if not exists(f'/etc/nginx/sites-available/{site_name}'):
+        sudo(f'sed "s/SITENAME/{site_name}/g" '
+            f' {source_folder}/deploy_tools/nginx.template.conf | tee'
+            f' /etc/nginx/sites-available/{site_name}'
+        )
+    if not exists(f'/etc/nginx/sites-enabled/{site_name}'):
+        sudo(f'ln -s /etc/nginx/sites-available/{site_name}'
+             f' /etc/nginx/sites-enabled/{site_name}'
+        )
+    if not exists(f'/etc/systemd/system/gunicorn-{site_name}.service'):
+        sudo(f'sed "s/SITENAME/{site_name}/g"'
+            f' {source_folder}/deploy_tools/gunicorn-systemd.template.service | tee'
+            f' /etc/systemd/system/gunicorn-{site_name}.service'
+        )
 
