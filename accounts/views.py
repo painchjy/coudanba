@@ -21,7 +21,7 @@ def send_login_email(request):
     send_mail(
             'Your login link for Superlists',
             message_body,
-            '13916341082@qq.com',
+            'painchjy@gmail.com',
             [email],
     )
     messages.success(
