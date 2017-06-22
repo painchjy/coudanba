@@ -4,6 +4,7 @@ from selenium.common.exceptions import WebDriverException
 import time
 import os
 from .server_tools import reset_database
+from selenium.webdriver.common.keys import Keys
 
 MAX_WAIT = 10
 class FunctionalTest(StaticLiveServerTestCase):
@@ -77,3 +78,14 @@ class FunctionalTest(StaticLiveServerTestCase):
         return self.browser.find_element_by_id('id_text')
     def get_error_element(self):
         return self.browser.find_element_by_css_selector('.has-error')
+
+    def add_list_item(self, item_text):
+        num_rows = len(self.browser.find_elements_by_css_selector('#id_list_table tr'))
+        self.get_item_input_box().send_keys(item_text)
+        self.get_item_input_box().send_keys(Keys.ENTER)
+        item_number = num_rows + 1
+        self.wait_for_row_in_list_table(
+            '{}: {}'.format(item_number, item_text)
+        )
+
+
