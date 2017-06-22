@@ -4,6 +4,9 @@ from lists.forms import ItemForm, ExistingListItemForm
 from django.core.exceptions import ValidationError
 
 # Create your views here.
+def my_lists(request, email):
+    return render(request, 'my_lists.html')
+
 def home_page(request):
     return render(request,'home.html',{'form': ItemForm()})
 
