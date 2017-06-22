@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'lists',
     'accounts',
+    'functional_tests',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -135,3 +136,20 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True 
 EMAIL_HOST_USER = 'painchjy@gmail.com'
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+     },
+     'loggers': {
+         'django': {
+             'handlers': ['console'],
+         },
+     },
+     'root': {'level': 'INFO'},
+}
