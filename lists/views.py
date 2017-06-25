@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from lists.models import Item, List
-from lists.forms import ItemForm, ExistingListItemForm
+from lists.forms import ItemForm, ExistingListItemForm, NewListForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -25,22 +25,10 @@ def view_list(request, list_id):
     return render(request, 'list.html', { 'list': list_,  'form': form})
 
 def new_list(request):
-    form = ItemForm(data=request.POST)
+    form = NewListForm(data=request.POST)
     if form.is_valid():
-        list_ = List()
-        list_.owner = request.user
-        list_.save()
-        form.save(for_list = list_)
+        list_ = form.save(owner=request.user)
         return redirect(list_)
-    else:
-        return render(request, 'home.html', {'form': form})
+    return render(request, 'home.html', {'form': form})
 
-    #try:
-    #    item.full_clean()
-    #    item.save()
-    #except ValidationError:
-    #    list_.delete()
-    #    error = "You can't have an empty list item"
-    #    return render(request, 'home.html',{'error': error, 'form': ItemForm()})
-    #return redirect(list_)
 
