@@ -17,15 +17,15 @@ def send_login_email(request):
     url = request.build_absolute_uri(
         reverse('login') + '?token=' + str(token.uid)
     )
-    message_body = f'Use this link to log in:\n\n{url}'
+    message_body = f'请使用以下链接登录聚一聚：\n\n{url}'
     send_mail(
-            'Your login link for Superlists',
+            '聚一聚的登录链接',
             message_body,
             'painchjy@gmail.com',
             [email],
     )
     messages.success(
         request,
-        "Check your email, we've sent you a link you can use to log in."
+        "登录链接已发送，请检查你的邮箱。"
     )
     return redirect('/')

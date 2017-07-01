@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 from django.test import TestCase
 from lists.forms import (
-    EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR,
+    EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR, NEED_TO_LOGIN_ERROR,
     ExistingListItemForm,ItemForm, NewListForm
 )
 from lists.models import Item, List

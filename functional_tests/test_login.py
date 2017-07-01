@@ -8,7 +8,7 @@ import time
 from .base import FunctionalTest
 
 # TEST_EMAIL = '13916341082@163.com'
-SUBJECT = 'Your login link for Superlists'
+SUBJECT = '聚一聚的登录链接'
 
 class LoginTest(FunctionalTest):
 
@@ -57,7 +57,7 @@ class LoginTest(FunctionalTest):
 
         # A message appears telling her an email has been sent
         self.wait_for(lambda: self.assertIn(
-            'Check your email',
+            '登录链接已发送，请检查你的邮箱',
             self.browser.find_element_by_tag_name('body').text
         ))
 
@@ -65,7 +65,7 @@ class LoginTest(FunctionalTest):
         body = self.wait_for_email(test_email, SUBJECT)
 
         # It has a url link in it
-        self.assertIn('Use this link to log in', body)
+        self.assertIn('请使用以下链接登录', body)
         url_search = re.search(r'http://.+/.+$', body)
         if not url_search:
             self.fail(f'Could not find url in email body:\n{body}')
@@ -79,7 +79,7 @@ class LoginTest(FunctionalTest):
         self.wait_to_be_logged_in(email=test_email)
 
         # Now she logs out
-        self.browser.find_element_by_link_text('Log out').click()
+        self.browser.find_element_by_link_text('注销').click()
 
         # She is logged out
         self.wait_to_be_logged_out(email=test_email)
