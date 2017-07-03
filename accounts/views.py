@@ -3,6 +3,8 @@ from django.core.mail import send_mail
 from django.contrib import auth, messages
 from accounts.models import Token
 from django.core.urlresolvers import reverse
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 def login(request):
     user = auth.authenticate(uid=request.GET.get('token'))
@@ -13,6 +15,16 @@ def login(request):
 
 def send_login_email(request):
     email = request.POST['email']
+    try:
+        User.objects.get(email=email)
+    except User.DoesNotExist:
+        messages.success(
+            request,
+            "{}不在凑单吧的授权邮箱列表（bankcomm.com）内。".format(email)
+        )
+        return redirect('/')
+
+        
     token = Token.objects.create(email=email)
     url = request.build_absolute_uri(
         reverse('login') + '?token=' + str(token.uid)

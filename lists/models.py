@@ -127,7 +127,7 @@ class Item(models.Model):
         self.qty_ = None
         self.price_ = None
         
-    text = models.TextField(default='')
+    text = models.CharField(default='', max_length=140)
     list = models.ForeignKey(List, default=None)
     
     def parse_text(self):

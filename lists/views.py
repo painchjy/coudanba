@@ -4,6 +4,7 @@ from lists.forms import ItemForm, JuItemForm, ExistingListItemForm, NewListForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
+import csv
 User = get_user_model()
 
 # Create your views here.
@@ -48,10 +49,16 @@ def home_page(request):
         except:
             pass
 
-    if current_ju:
-        return new_order(request)
-    else:
-        return new_list(request)
+    form = NewListForm()
+    if not current_ju:
+        form.fields['text'].widget.attrs['placeholder'] = '怎么填都行'
+    if request.method == 'POST':
+        if current_ju:
+            return new_order(request)
+        else:
+            return new_list(request)
+    return render(request, 'home.html', {'form': form, 'current_ju': current_ju })
+
 
 def view_list(request, list_id):
     list_ = List.objects.get(id = list_id)
@@ -86,4 +93,14 @@ def new_order(request):
             return redirect(list_)
     return render(request, 'home.html', {'form': form, 'current_ju': current_ju })
 
+def load_users(request):
 
+    path = './users.csv'
+    with open(path) as f:
+        reader = csv.reader(f,delimiter=';')
+        for row in reader:
+            _, created = User.objects.get_or_create(
+                email=row[0],
+                defaults={'depart_name': row[1]},
+            )
+    return redirect('/')

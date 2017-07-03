@@ -12,6 +12,7 @@ ORDER_FORMAT_ERROR = "代号和数量，用空格分开就可以了"
 BILL_FORMAT_ERROR = "名称、数量和单价，用空格分开就可以了"
 ITEMCD_NOT_VALID_ERROR = "“{}”是什么代号啊亲！选{}啊！"
 JU_FORMAT_ERROR = "管理凑单活动太复杂了"
+TOO_LONG_ERROR = "输入太多了"
 
 class ItemForm(forms.models.ModelForm):
 
@@ -25,7 +26,7 @@ class ItemForm(forms.models.ModelForm):
             }),
         }
         error_messages = {
-            'text': {'required': EMPTY_ITEM_ERROR }
+                'text': {'required': EMPTY_ITEM_ERROR,'max_length': TOO_LONG_ERROR }
         }
 
 class JuItemForm(forms.models.ModelForm):
