@@ -93,14 +93,21 @@ def new_order(request):
             return redirect(list_)
     return render(request, 'home.html', {'form': form, 'current_ju': current_ju })
 
-def load_users(request):
+def load_users(request, ju_id):
+    ju = Ju.objects.get(id = ju_id)
+    if ju.owner:
+        if request.user != ju.owner:
+            return redirect(reverse('home'))
 
-    path = './users.csv'
-    with open(path) as f:
-        reader = csv.reader(f,delimiter=';')
-        for row in reader:
-            _, created = User.objects.get_or_create(
-                email=row[0],
-                defaults={'depart_name': row[1]},
-            )
-    return redirect('/')
+    form = JuItemForm()
+    form.fields['content'].initial = '\n'.join(
+        ['{};{}'.format(row.email,row.depart_name) for row in User.objects.all()]
+    )
+
+    if request.method == 'POST':
+        form = JuItemForm(data=request.POST)
+        if form.is_valid():
+            form.load_users()
+
+    return render(request, 'load_users.html', {  'form': form, 'current_ju': ju})
+

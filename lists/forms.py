@@ -4,6 +4,9 @@ from django.core.exceptions import ValidationError
 import shlex
 import re
 import json
+from django.contrib.auth import get_user_model
+import csv
+User = get_user_model()
 
 EMPTY_ITEM_ERROR = "You can't have an empty list item"
 DUPLICATE_ITEM_ERROR = "重复内容就不要提交给凑单吧了！"
@@ -54,6 +57,16 @@ class JuItemForm(forms.models.ModelForm):
             ju.save()
             return ju
         self.add_error('content', JU_FORMAT_ERROR)
+
+    def load_users(self):
+
+        f = self.cleaned_data['content']
+        for line in f.splitlines():
+            row = line.split(';')
+            user, created = User.objects.update_or_create(
+                email=row[0],
+                defaults={'depart_name': row[1]},
+            )
 
 class ExistingListItemForm(ItemForm):
     def __init__(self, for_list, *args, **kwargs):
