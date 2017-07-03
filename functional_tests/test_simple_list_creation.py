@@ -2,7 +2,9 @@ from .base import FunctionalTest
 from unittest import skip
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from django.utils.html import escape
 import time
+from django.conf import settings
 
 class NewVisitorTest(FunctionalTest):
     def test_can_start_a_bill_for_one_user_without_ju(self):
@@ -17,7 +19,7 @@ class NewVisitorTest(FunctionalTest):
         # She is invited to make her first order
         inputbox = self.get_item_input_box()
         self.assertEqual(
-            '账单格式：名称 数量 单价；示例：车厘子1公斤 1.5 129.9',
+            '怎么填都行',
             inputbox.get_attribute('placeholder'),
             "Attribute placeholder for the inputbox not exists or not set the correct value"
         )
@@ -28,7 +30,7 @@ class NewVisitorTest(FunctionalTest):
         # When she hits enter, the page updates, and now the page lists
         # Product A and  1 QTY shows in the list table
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_order_in_list_table('车厘子', 1.5, 129.9*1.5)
+        self.wait_for_row_order_in_list_table('1: 车厘子', 1.5,129.9, 129.9*1.5)
 
         
         # There is still a text box inviting her to add another item. She
@@ -38,8 +40,8 @@ class NewVisitorTest(FunctionalTest):
         inputbox.send_keys(Keys.ENTER)
         
         # The page updates again, and now shows both items on her list
-        self.wait_for_row_order_in_list_table('车厘子', 1.5, 129.9*1.5)
-        self.wait_for_row_order_in_list_table('T-shirt', 2, 39*2)
+        self.wait_for_row_order_in_list_table('1: 车厘子', 1.5,129.9, 129.9*1.5)
+        self.wait_for_row_order_in_list_table('2: T-shirt', 2,39, 39*2)
         
         # Satisfied, she goes back to sleep
     
@@ -49,7 +51,7 @@ class NewVisitorTest(FunctionalTest):
         ## self.browser.get('http://localhost:8000') ## 要使用测试库，要通过live_server_url访问,测试环境使用8081端口
         email = 'edith@example.com'
         # Edith is a logged-in user
-        self.create_pre_authenticated_session(email)
+        session_key = self.create_pre_authenticated_session(email)
         active_ju = self.load_fixture_ju()
 
         # She goes to the home page and starts a list
@@ -60,33 +62,86 @@ class NewVisitorTest(FunctionalTest):
         # She is invited to make her first order
         inputbox = self.get_item_input_box()
         self.assertEqual(
-            '下单格式：编号 数量；示例：A 1.5',
+            '输入：代号 数量；示例：A 1.5',
             inputbox.get_attribute('placeholder'),
             "Attribute placeholder for the inputbox not exists or not set the correct value"
         )
         
+        # She try to add and unexisted item "c 2" 
+        inputbox = self.get_item_input_box()
+        inputbox.send_keys('c 1.5')
+        inputbox.send_keys(Keys.ENTER)
+
+        self.wait_for(lambda: self.assertIn(
+            "什么代号啊亲！",
+            self.get_error_element().text,
+        ))
+
         # She  orders one product A 
+        inputbox = self.get_item_input_box()
+        inputbox.clear()
         inputbox.send_keys('A 1')
         
         # When she hits enter, the page updates, and now the page lists
         # Product A and  1 QTY shows in the list table
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_order_in_list_table('A', 1, active_ju.items['A']['price'])
+        self.wait_for_row_order_in_list_table('1: A', 1, active_ju.items['A']['price'],active_ju.items['A']['price'])
 
         
         # There is still a text box inviting her to add another item. She
-        # enters "B 2" 
+        # enters "b 2" 
         inputbox = self.get_item_input_box()
-        inputbox.send_keys('B 1.5')
+        inputbox.send_keys('b 1.5')
         inputbox.send_keys(Keys.ENTER)
         
         # The page updates again, and now shows both items on her list
-        self.wait_for_row_order_in_list_table('B', 1.5, active_ju.items['B']['price']*1.5)
-        self.wait_for_row_order_in_list_table('A', 1, active_ju.items['A']['price'])
+        self.wait_for_row_order_in_list_table('2: b', 1.5,active_ju.items['B']['price'], active_ju.items['B']['price']*1.5)
+        self.wait_for_row_order_in_list_table('1: A', 1, active_ju.items['A']['price'],active_ju.items['A']['price'])
         
+        # There is still a text box inviting her to add another item. She
+        # try to add and unexisted item "c 2" 
+        inputbox = self.get_item_input_box()
+        inputbox.send_keys('c 1.5')
+        inputbox.send_keys(Keys.ENTER)
+
+        self.wait_for(lambda: self.assertIn(
+            "什么代号啊亲！",
+            self.get_error_element().text,
+        ))
         # Satisfied, she goes back to sleep
 
-    @skip
+
+        # Edith wonders whether the site will remember her list. Then she sees
+        # that the site has generated a unique URL for her -- there is some
+        # explanatory text to that effect.
+        #self.browser.quit()
+        #self.browser = webdriver.Firefox()
+        self.browser.find_element_by_link_text('注销').click()
+        self.wait_to_be_logged_out(email)
+        #email = 'edith@example.com'
+        # Edith is a logged-in user
+        self.create_pre_authenticated_session(email)
+        # She goes to the home page and see the order she make yestoday
+        self.browser.get(self.live_server_url)
+        self.wait_to_be_logged_in(email)
+
+
+        # The page shows what she saw yestoday
+        self.wait_for_row_order_in_list_table('2: b', 1.5,active_ju.items['B']['price'], active_ju.items['B']['price']*1.5)
+        self.wait_for_row_order_in_list_table('1: A', 1, active_ju.items['A']['price'],active_ju.items['A']['price'])
+
+        # There is still a text box inviting her to add another item. She
+        # want to change item b to "B 3" 
+        inputbox = self.get_item_input_box()
+        inputbox.clear()
+        inputbox.send_keys('B 3')
+        inputbox.send_keys(Keys.ENTER)
+        
+        # The page updates again, and now shows both items on her list
+        self.wait_for_row_order_in_list_table('2: B', 3,active_ju.items['B']['price'], active_ju.items['B']['price']*3)
+        self.wait_for_row_order_not_in_list_table('2: b', 1.5,active_ju.items['B']['price'], active_ju.items['B']['price']*1.5)
+        # Satisfied, she goes back to sleep
+
     def test_multiple_users_can_start_lists_at_different_urls(self):
         # Edith wonders whether the site will remember her list. Then she sees
         # that the site has generated a unique URL for her -- there is some

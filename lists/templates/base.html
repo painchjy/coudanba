@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>聚一聚</title>
+		<title>凑单吧</title>
 		<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/static/base.css" rel="stylesheet">
 	</head>
@@ -12,10 +12,13 @@
 	<div class="container">
 	    <nav class="navbar navbar-default" role="navigation">
 		<div class="container-fluid">
-		    <a class="navbar-brand" href="/">聚一聚</a>
+		    <a class="navbar-brand" href="/">凑单吧</a>
 		    {% if user.email %}
 		      <ul class="nav navbar-nav navbar-left">
-		        <li><a href="{% url 'my_lists' user.email %}">我的订单</a></li>
+		        <li><a href="{% url 'my_lists' user.email %}">我的凑单</a></li>
+		      </ul>
+		      <ul class="nav navbar-nav navbar-left">
+		        <li><a href="{% url 'manage_jus' user.email %}">管理</a></li>
 		      </ul>
 		      <ul class="nav navbar-nav navbar-right">
 		        <li class="navbar-text">账号： {{ user.email }} </li>
@@ -47,15 +50,32 @@
 		<div class="col-md-6 col-md-offset-3 jumbotron">
 		    <div class="text-center">
 		        <h2>{% block header_text %}{% endblock %}</h2>
-		        {% block ju_table %}
-		        {% endblock %}
+{% block ju_table %}
+  {% if current_ju %}
+    <table id="id_ju_table" class="table">
+        <tr><th style='text-align: center;'>代号</th><th style='text-align: center;'>说明</th><th style='text-align: center;'>单价</th></tr>
+    {% for k,v in current_ju.sorted_items %}
+	<tr>
+		<td style='text-align: left;'>{{ k }}</td>
+		<td style='text-align: center;'>{{ v.desc }}</td>
+		<td style='text-align: right;'>{{ v.price|floatformat:2 }} </td>
+	</tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+{% endblock %}
 			{% block list_form %}
 		          <form method="POST" action="{% block form_action %}{% endblock %}">
 			  {{ form.text }}
+			  {{ form.content }}
+			  {% block submit_button %}{% endblock %}
 		          {% csrf_token %}
 			  {% if form.errors %}
 			      <div class="form-group has-error">
-			  	<span class="help-block">{{ form.text.errors }}</span>
+			  	<span class="help-block">
+					{{ form.text.errors }}
+					{{ form.content.errors }}
+				</span>
 			      </div>
 			  {% endif%}
 		          </form>

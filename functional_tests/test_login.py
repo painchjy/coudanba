@@ -8,7 +8,7 @@ import time
 from .base import FunctionalTest
 
 # TEST_EMAIL = '13916341082@163.com'
-SUBJECT = '聚一聚的登录链接'
+SUBJECT = '凑单吧的登录链接'
 
 class LoginTest(FunctionalTest):
 

@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% block header_text %}My lists{% endblock %}
+{% block header_text %}我的凑单{% endblock %}
 {% block list_form %}{% endblock %}
 {% block extra_content %}
-    <h2>账号：{{ owner.email }}的账单</h2>
+    <h2>账号：{{ owner.email }}的凑单</h2>
     <ul>
 	{% for list in owner.list_set.all %}
 	    <li><a href="{{ list.get_absolute_url}}">{{list.name}}</a></li>

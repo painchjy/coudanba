@@ -1,6 +1,7 @@
 from .base import FunctionalTest
 from selenium.webdriver.common.keys import Keys
 from unittest import skip
+from lists.forms import DUPLICATE_ITEM_ERROR
 
 class ItemValidationTest(FunctionalTest):
     def test_error_messages_are_cleared_on_input(self):
@@ -57,7 +58,7 @@ class ItemValidationTest(FunctionalTest):
         #She sees a helpfull error message
         self.wait_for(lambda: self.assertEqual(
             self.get_error_element().text,
-            "You've already got this in your list"
+            DUPLICATE_ITEM_ERROR
         ))
 
     def test_cannot_add_empty_list_items_html5(self):

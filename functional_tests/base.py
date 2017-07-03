@@ -68,14 +68,21 @@ class FunctionalTest(StaticLiveServerTestCase):
     def wait_for_row_in_list_table(self, row_text):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('{} 0.00 0.00 0.00'.format(row_text), [row.text for row in rows])
+
+    @wait
+    def wait_for_row_order_in_list_table(self, cd, qty, price, cost):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        row_text = '{} {:.2f} {:.2f} {:.2f}'.format(cd,qty,price,cost)
         self.assertIn(row_text, [row.text for row in rows])
 
     @wait
-    def wait_for_row_order_in_list_table(self, cd, qty, price):
+    def wait_for_row_order_not_in_list_table(self, cd, qty, price, cost):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        row_text = '{}{}{}'.format(cd,qty,price)
-        self.assertIn(row_text, ''.join([row.text for row in rows]))
+        row_text = '{} {:.2f} {:.2f} {:.2f}'.format(cd,qty,price,cost)
+        self.assertNotIn(row_text, [row.text for row in rows])
 
     @wait
     def wait_for_row_in_ju_table(self, row_text):
@@ -103,7 +110,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         return self.browser.find_element_by_css_selector('.has-error')
 
     def add_list_item(self, item_text):
-        num_rows = len(self.browser.find_elements_by_css_selector('#id_list_table tr'))
+        num_rows = max(len(self.browser.find_elements_by_css_selector('#id_list_table tr')) - 2,0)
         self.get_item_input_box().send_keys(item_text)
         self.get_item_input_box().send_keys(Keys.ENTER)
         item_number = num_rows + 1
@@ -133,4 +140,5 @@ class FunctionalTest(StaticLiveServerTestCase):
             value = session_key,
             path = '/',
             ))
+        return session_key
 

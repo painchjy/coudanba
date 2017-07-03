@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block header_text %}新建凑单活动{% endblock %}
+{% block form_action %} {% url 'manage_jus' owner.email %} {% endblock %}
+{% block submit_button %}<input type="submit" value="Submit"> {% endblock %}
+{% block extra_content %}
+    <h2>账号：{{ owner.email }}创建的活动</h2>
+    <ul>
+	{% for ju in owner.ju_set.all %}
+	<li><a href="{{ ju.get_absolute_url}}">{{ju.name}}（{{ju.status}}）</a></li>
+	{% endfor %}
+    </ul>
+{% endblock %}

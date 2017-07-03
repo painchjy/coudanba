@@ -1,27 +1,10 @@
 {% extends 'base.html' %}
 {% block header_text %}
-  {% if active_ju %}
-    提货地点：{{ active_ju.address }}<br/>
-    下单截止时间：{{active_ju.stop_date }}
+  {% if current_ju %}
+    凑单地点：{{ current_ju.address }}<br/>
+    截止时间：{{current_ju.stop_date }}
   {% else %}
-      活动还没开始呢！不过你可以先玩一玩记账。
-  {% endif %}
-{% endblock %}
-{% block ju_table %}
-  {% if active_ju %}
-    <table id="id_ju_table" class="table">
-        <tr><th style='text-align: center;'>编号</th><th style='text-align: center;'>说明</th><th style='text-align: center;'>单价</th></tr>
-    {% for k,v in active_ju.sorted_items %}
-	<tr><td>{{ k }}</td><td>{{ v.desc }}</td><td>{{ v.price }} </td></tr>
-    {% endfor %}
-    </table>
+      不和别人凑，自己凑着玩！
   {% endif %}
 {% endblock %}
 {% block form_action %}{% url 'home' %}{%endblock %}
-{% block table %}
-	<table id="id_list_table" class="table">
-	    {% for item in list.item_set.all %}
-		    <tr><td>{{forloop.counter}}: {{ item.text}}</td></tr>
-	    {% endfor %}
-	</table>
-{% endblock %}

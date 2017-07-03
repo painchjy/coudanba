@@ -1,22 +1,11 @@
 {% extends 'base.html' %}
 
 {% block header_text %}
-  {% if active_ju %}
-    我的聚活动：<br/>
-    提货地点：{{ active_ju.address }}<br/>
-    下单截止时间：{{active_ju.stop_date }}
+  {% if current_ju %}
+    凑单地点：{{ current_ju.address }}<br/>
+    截止时间：{{current_ju.stop_date }}
   {% else %}
-      我的账单:{{ list.name }}
-  {% endif %}
-{% endblock %}
-{% block ju_table %}
-  {% if active_ju %}
-    <table id="id_ju_table" class="table">
-        <tr><th style='text-align: center;'>编号</th><th style='text-align: center;'>说明</th><th style='text-align: center;'>单价</th></tr>
-    {% for k,v in active_ju.sorted_items %}
-	<tr><td>{{ k }}</td><td>{{ v.desc }}</td><td>{{ v.price }} </td></tr>
-    {% endfor %}
-    </table>
+      凑着玩:{{ list.name }}
   {% endif %}
 {% endblock %}
 
@@ -31,16 +20,16 @@
 		</tr>
 	    {% for item in list.item_set.all %}
 		    <tr>
-			<td style='text-align: left;'>{{ forloop.counter0 }}: {{ item.name}}</td>
-		        <td style='text-align: right;'>{{ item.qty}}</td>
-		        <td style='text-align: right;'>{{ item.price}}</td>
-			<td style='text-align: right;'>{{ item.cost|floatformat:-2 }}</td>
+			<td style='text-align: left;'>{{ forloop.counter }}: {{ item.name}}</td>
+		        <td style='text-align: right;'>{{ item.qty|floatformat:2}}</td>
+		        <td style='text-align: right;'>{{ item.price|floatformat:2}}</td>
+			<td style='text-align: right;'>{{ item.cost|floatformat:2 }}</td>
 		    </tr>
 	    {% endfor %}
 	        <tr>
 			<th></th><th></th>
 			<th style='text-align: right;'>总价：</th>
-			<th style='text-align: right;'>{{ list.total_cost|floatformat:-2 }}</th>
+			<th style='text-align: right;'>{{ list.total_cost|floatformat:2 }}</th>
 		</tr>
 	</table>
 {% endblock %}

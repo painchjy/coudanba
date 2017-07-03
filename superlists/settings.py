@@ -132,9 +132,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static'))
 
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.qq.com'
 EMAIL_USE_TLS = True 
-EMAIL_HOST_USER = 'painchjy@gmail.com'
+EMAIL_HOST_USER = '13916341082@qq.com'
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
 LOGGING = {

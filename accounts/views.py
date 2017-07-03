@@ -17,11 +17,11 @@ def send_login_email(request):
     url = request.build_absolute_uri(
         reverse('login') + '?token=' + str(token.uid)
     )
-    message_body = f'请使用以下链接登录聚一聚：\n\n{url}'
+    message_body = f'请使用以下链接登录凑单吧：\n\n{url}'
     send_mail(
-            '聚一聚的登录链接',
+            '凑单吧的登录链接',
             message_body,
-            'painchjy@gmail.com',
+            '13916341082@qq.com',
             [email],
     )
     messages.success(
