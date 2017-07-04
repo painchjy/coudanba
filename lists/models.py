@@ -151,6 +151,7 @@ class Item(models.Model):
         self.price_ = 0
         last_n = None
         prior_n = None
+        print('-----units:{},last_index:{}'.format(units,last_index))
         try:
             if last_index >= 1:
                 last_n = float(units[last_index])
@@ -159,14 +160,15 @@ class Item(models.Model):
         except (ValueError,IndexError) as e:
             pass
         if self.list.ju:
-            if last_n:
+            if last_n!=None:
                 self.name_ = re.sub(r'\s+[-+]?[0-9]\d*(\.\d+)?\s*$','', self.text)
                 self.qty_ = last_n
             else:
                 self.name_ = self.text
+            print('------name:{},qty:{}'.format(self.name_,self.qty_))
             self.price_ = self.list.ju.items[self.name_.upper()]['price']
-        elif last_n:
-            if prior_n:
+        elif last_n!=None:
+            if prior_n!=None:
                 self.price_ = last_n
                 self.qty_ = prior_n
                 self.name_ = re.sub(r'\s+[-+]?[0-9]\d*(\.\d+)?\s+[-+]?[0-9]\d*(\.\d+)?\s*$','', self.text)
