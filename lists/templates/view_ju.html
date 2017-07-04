@@ -2,3 +2,25 @@
 {% block header_text %}凑单活动{% endblock %}
 {% block form_action %} {% url 'view_ju' current_ju.id %} {% endblock %}
 {% block submit_button %}<input type="submit" value="Submit"> {% endblock %}
+{% block extra_content %}
+    <table id="id_ju_order_list" class="table">
+	{% for list_ in current_ju.list_set.all %}
+	<tr>
+		<th>部门</th>
+		<th>账号</th>
+		{% for k,v in current_ju.sorted_items %}
+		<th>{{k}}:{{v.desc|slice:"0:8"}} </th>
+		{% endfor%}
+		<th>金额</th>
+	</tr>
+	<tr>
+		<td style='text-align: center'>{{list_.owner.depart_name}}</td>
+		<td style='text-align: center'>{{list_.owner.email}}</td>
+		{% for qty in list_.qtys_by_ju %}
+		<td style='text-align: right'>{{qty}}</td>
+		{% endfor%}
+		<td style='text-align: right'>{{list_.total_cost}}</td>
+	</tr>
+	{% endfor %}
+    </table>
+{% endblock %}

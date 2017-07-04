@@ -106,6 +106,20 @@ class List(models.Model):
     @property
     def total_cost(self):
         return sum(i.cost for i in self.item_set.all())
+    @property
+    def items_to_text(self):
+        return ';'.join(['{}:{:.2f}'.format(i.name,i.qty).upper() for i in self.item_set.all()])
+
+    @property
+    def qtys_by_ju(self):
+        qtys=[]
+        for k,v in self.ju.sorted_items:
+            try:
+                qty = Item.objects.get(list=self, text__istartswith=k).qty
+            except:
+                qty = '' 
+            qtys.append(qty)
+        return qtys
 
     def get_absolute_url(self):
         return reverse('view_list', args=[self.id])
