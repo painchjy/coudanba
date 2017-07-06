@@ -3,7 +3,7 @@
 {% block list_form %}{% endblock %}
 {% block extra_content %}
     <h2>账号：{{ owner.email }}的凑单</h2>
-    <h3>部门：{{ owner.depart_name }}</h3>
+    <h3>群组名称：{{ owner.depart_name }}</h3>
     <ul>
 	{% for list in owner.list_set.all %}
 	    <li><a href="{{ list.get_absolute_url}}">{{list.name}}</a></li>

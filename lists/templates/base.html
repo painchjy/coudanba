@@ -16,17 +16,26 @@
 		    {% if user.email %}
 		      <ul class="nav navbar-nav navbar-left">
 		        <li><a href="{% url 'my_lists' user.email %}">我的凑单</a></li>
-		        <li><a href="{% url 'manage_jus' user.email %}">管理</a></li>
+		        <li><a href="{% url 'list_jus' %}">活动</a></li>
 		      </ul>
 		      <ul class="nav navbar-nav navbar-right">
-		        <li class="navbar-text">账号： {{ user.email }} </li>
+			<li class="navbar-text">群组：{{user.depart_name}} </li>
+			<li class="navbar-text">账号： {{ user.email }} </li>
+			<li><a href="{% url 'user_invite' %}">邀请</a></li>
 			<li><a href="{% url 'logout' %}">注销</a></li>
 		      </ul>
 		    {% else %}
 		      <form class="navbar-form navbar-right" method="POST" action="{% url 'send_login_email' %}">
-			<span>Enter email to log in:</span>
-			<input class="form-control" name="email" type="text"/>
+			<span>输入邮箱登录:</span>
+			{{ email_input_form.email }}
 			{% csrf_token %}
+			  {% if email_input_form.errors %}
+			      <div class="form-group has-error">
+			  	<span class="help-block">
+					{{ email_input_form.email.errors }}
+				</span>
+			      </div>
+			  {% endif%}
 		      </form>
 		    {% endif %}
 		</div>
@@ -51,12 +60,18 @@
 {% block ju_table %}
   {% if current_ju %}
     <table id="id_ju_table" class="table">
-        <tr><th style='text-align: center;'>代号</th><th style='text-align: center;'>说明</th><th style='text-align: center;'>单价</th></tr>
+        <tr>
+		<th style='text-align: center;'>代号</th>
+		<th style='text-align: center;'>说明</th>
+		<th style='text-align: center;'>单价</th>
+		<th style='text-align: center;'>总凑单数</th>
+	</tr>
     {% for k,v in current_ju.sorted_items %}
 	<tr>
 		<td style='text-align: left;'>{{ k }}</td>
 		<td style='text-align: center;'>{{ v.desc }}</td>
 		<td style='text-align: right;'>{{ v.price|floatformat:2 }} </td>
+		<td style='text-align: right;'>{{ v.qty_sum|floatformat:2 }} </td>
 	</tr>
     {% endfor %}
     </table>
@@ -66,6 +81,8 @@
 		          <form method="POST" action="{% block form_action %}{% endblock %}">
 			  {{ form.text }}
 			  {{ form.content }}
+			  {% block user_invite_form_inputs %}
+			  {% endblock %}
 			  {% block submit_button %}{% endblock %}
 		          {% csrf_token %}
 			  {% if form.errors %}

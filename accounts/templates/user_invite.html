@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block header_text %}邀请{% endblock %}
+{% block form_action %} {% url 'user_invite' %} {% endblock %}
+{% block user_invite_form_inputs %} 
+			 {{ form.email }}
+			 <br/>
+			 <h4>邀请内容</h4>
+			  {{ form.memo }}
+			 <br/>
+			 <h4>邀请加入的群组名称</h4>
+			  {{ form.group_name }}
+			  {% if form.errors %}
+			      <div class="form-group has-error">
+			  	<span class="help-block">
+					{{ form.email.errors }}
+					{{ form.memo.errors }}
+					{{ form.group_name.errors }}
+				</span>
+			      </div>
+			  {% endif%}
+{% endblock %}
+{% block submit_button %}<br/><input type="submit" value="Submit"> {% endblock %}

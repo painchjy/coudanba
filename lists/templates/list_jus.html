@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block header_text %}所有凑单活动{% endblock %}
+{% block extra_content %}
+    <table id="id_jus_list" class="table">
+	<tr>
+		<th>凑单地点</th>
+		<th>截止时间</th>
+		<th>活动状态</th>
+		<th>创建日期</th>
+		<th>创建者</th>
+	</tr>
+	{% for ju in owner.ju_set.all %}
+	<tr>
+		<td style='text-align: center'><a href="{{ ju.get_absolute_url}}">{{ju.address}}</a></td>
+		<td style='text-align: center'>{{ju.stop_date}}</td>
+		<td style='text-align: right'>{{ju.status}}</td>
+		<td style='text-align: right'>{{ju.created_at}}</td>
+		<td style='text-align: right'>{{ju.owner.email}}</td>
+	</tr>
+	{% endfor %}
+    </table>
+{% endblock %}

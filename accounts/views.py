@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
-from django.core.mail import send_mail
 from django.contrib import auth, messages
-from accounts.models import Token
-from django.core.urlresolvers import reverse
+from accounts.forms import EmailInputForm, UserInviteForm
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
+
 
 def login(request):
     user = auth.authenticate(uid=request.GET.get('token'))
@@ -13,32 +13,27 @@ def login(request):
 
     return redirect('/')
 
-def send_login_email(request):
-    email = request.POST['email']
-    try:
-        if email != '13916341082@qq.com':
-            User.objects.get(email=email)
-    except User.DoesNotExist:
-        messages.success(
-            request,
-            "{}不在凑单吧的授权邮箱列表（bankcomm.com）内。".format(email)
-        )
-        return redirect('/')
 
-        
-    token = Token.objects.create(email=email)
-    url = request.build_absolute_uri(
-        reverse('login') + '?token=' + str(token.uid)
-    )
-    message_body = f'请使用以下链接登录凑单吧：\n\n{url}'
-    send_mail(
-            '凑单吧的登录链接',
-            message_body,
-            '13916341082@qq.com',
-            [email],
-    )
-    messages.success(
-        request,
-        "登录链接已发送，请检查你的邮箱。"
-    )
+def send_login_email(request):
+    form = EmailInputForm()
+    if request.method == 'POST':
+        form = EmailInputForm(data=request.POST)
+        if form.is_valid():
+            form.regist_email(request)
+    if form.errors:
+        messages.warning(
+            request,
+            form.errors['email']
+        )
     return redirect('/')
+
+def user_invite(request):
+    form = UserInviteForm()
+    memo = '凑单吧用户{}邀请您加入{}一起凑单，活动内容可以用下面的链接登录查看。'
+    form.fields['memo'].initial = memo.format(request.user.email, request.user.depart_name)
+    form.fields['group_name'].initial = request.user.depart_name
+    if request.method == 'POST':
+        form = UserInviteForm(data=request.POST)
+        if form.is_valid():
+            form.invite(request)
+    return render(request, 'user_invite.html', { 'form': form, 'owner': request.user})

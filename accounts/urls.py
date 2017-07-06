@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^send_login_email$',views.send_login_email, name='send_login_email' ),
     url(r'^login$',views.login, name='login' ),
     url(r'^logout$', logout, {'next_page': '/'}, name='logout'),
+    url(r'^user_invite$',views.user_invite, name='user_invite' ),
 ]

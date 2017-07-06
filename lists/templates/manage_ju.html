@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block header_text %}凑单活动{% endblock %}
+{% block form_action %} {% url 'view_ju' current_ju.id %} {% endblock %}
+{% block submit_button %}<br/><input type="submit" value="Submit"> {% endblock %}
 {% block extra_content %}
     <table id="id_ju_order_list" class="table">
 	<tr>
@@ -11,7 +13,6 @@
 		<th>金额</th>
 	</tr>
 	{% for list_ in current_ju.list_set.all %}
-	    {% if list_.owner.depart_name == owner.depart_name %}
 	<tr>
 		<td style='text-align: center'>{{list_.owner.depart_name}}</td>
 		<td style='text-align: center'>{{list_.owner.email}}</td>
@@ -20,7 +21,6 @@
 		{% endfor%}
 		<td style='text-align: right'>{{list_.total_cost}}</td>
 	</tr>
-	    {% endif %}
 	{% endfor %}
     </table>
 {% endblock %}

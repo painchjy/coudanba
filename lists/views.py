@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from lists.models import Item, List, Ju
 from lists.forms import ItemForm, JuItemForm, ExistingListItemForm, NewListForm
+from accounts.forms import EmailInputForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
@@ -10,9 +11,16 @@ User = get_user_model()
 # Create your views here.
 def view_ju(request, ju_id):
     ju = Ju.objects.get(id = ju_id)
+    owner = request.user
+    if request.user.is_authenticated:
+        return render(request, 'view_ju.html', { 'current_ju': ju,  'owner': owner})
+    return redirect('/')
+
+def manage_ju(request, ju_id):
+    ju = Ju.objects.get(id = ju_id)
     if ju.owner:
         if request.user != ju.owner:
-            return redirect(reverse('home'))
+            return view_ju(request, ju_id)
 
     form = JuItemForm()
     form.fields['content'].initial = ju.content
@@ -23,7 +31,7 @@ def view_ju(request, ju_id):
             saved_ju = form.save(owner=ju.owner, ju=ju)
             if saved_ju:
                 return redirect(saved_ju)
-    return render(request, 'view_ju.html', { 'current_ju': ju,  'form': form})
+    return render(request, 'manage_ju.html', { 'current_ju': ju,  'form': form})
 
 def manage_jus(request, email):
     owner = User.objects.get(email=email)
@@ -36,12 +44,18 @@ def manage_jus(request, email):
                 return redirect(ju)
     return render(request, 'manage_jus.html', {'form': form, 'owner': owner})
 
+def list_jus(request):
+    if request.user.is_authenticated:
+        return render(request, 'list_jus.html', { 'owner': request.user})
+    return redirect('/')
+
 def my_lists(request, email):
     owner = User.objects.get(email=email)
     return render(request, 'my_lists.html', {'owner': owner})
 
 def home_page(request):
     current_ju = Ju.active_ju()
+    email_input_form = EmailInputForm()
     if current_ju and request.user.is_authenticated :
         try:
             list_ = List.objects.get(ju = current_ju, owner = request.user) 
@@ -57,7 +71,7 @@ def home_page(request):
             return new_order(request)
         else:
             return new_list(request)
-    return render(request, 'home.html', {'form': form, 'current_ju': current_ju })
+    return render(request, 'home.html', {'form': form, 'current_ju': current_ju, 'email_input_form': email_input_form})
 
 
 def view_list(request, list_id):
@@ -67,6 +81,8 @@ def view_list(request, list_id):
             return redirect(reverse('home'))
 
     form = ExistingListItemForm(for_list = list_)
+    if list_.ju and list_.ju.status != 'active':
+        form.fields['text'].widget.attrs['readonly'] = True 
 
     if request.method == 'POST':
         form = ExistingListItemForm(for_list=list_, data=request.POST)

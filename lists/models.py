@@ -32,6 +32,14 @@ class Ju(models.Model):
             self.status_ = j['status']
             self.items_ = j['items']
             self.sorted_items_ = sorted(self.items_.items())
+            for k, v in self.sorted_items_:
+                qty_sum = sum(
+                    i.qty for i in Item.objects.filter(
+                        list__ju=self, 
+                        text__istartswith=k
+                ))
+                self.items_[k].update({'qty_sum': qty_sum})
+            self.sorted_items_ = sorted(self.items_.items())
         except (JSONDecodeError, ValueError, KeyError):
             return False
         return True
@@ -129,29 +137,28 @@ class List(models.Model):
         list_ = List(owner=owner, ju=ju)
         list_.full_clean()
         list_.save()
-        Item.objects.create(text=first_item_text, list=list_)
+        item = Item(text=first_item_text, list=list_)
+        item.save()
         return list_
 
 
 
 class Item(models.Model):
-    def __init__(self, *args, **kwargs):
-        super(Item, self).__init__(*args, **kwargs)
-        self.name_ = None
-        self.qty_ = None
-        self.price_ = None
         
     text = models.CharField(default='', max_length=140)
     list = models.ForeignKey(List, default=None)
-    
+    name = models.CharField(default='', max_length=140)
+    qty =  models.FloatField(default=0.0)
+    price =  models.FloatField(default=0.0)
+    def save(self):
+        self.parse_text()
+        super(Item, self).save()
+
     def parse_text(self):
         units = shlex.split(self.text)
         last_index = len(units) - 1
-        self.qty_ = 0
-        self.price_ = 0
         last_n = None
         prior_n = None
-        print('-----units:{},last_index:{}'.format(units,last_index))
         try:
             if last_index >= 1:
                 last_n = float(units[last_index])
@@ -160,45 +167,27 @@ class Item(models.Model):
         except (ValueError,IndexError) as e:
             pass
         if self.list.ju:
-            if last_n!=None:
-                self.name_ = re.sub(r'\s+[-+]?[0-9]\d*(\.\d+)?\s*$','', self.text)
-                self.qty_ = last_n
+            if last_n != None:
+                self.name = re.sub(r'\s+[-+]?[0-9]\d*(\.\d+)?\s*$','', self.text)
+                self.qty = last_n
             else:
-                self.name_ = self.text
-            print('------name:{},qty:{}'.format(self.name_,self.qty_))
-            self.price_ = self.list.ju.items[self.name_.upper()]['price']
-        elif last_n!=None:
+                self.name = self.text
+            self.price = self.list.ju.items[self.name.upper()]['price']
+        elif last_n != None:
             if prior_n!=None:
-                self.price_ = last_n
-                self.qty_ = prior_n
-                self.name_ = re.sub(r'\s+[-+]?[0-9]\d*(\.\d+)?\s+[-+]?[0-9]\d*(\.\d+)?\s*$','', self.text)
+                self.price = last_n
+                self.qty = prior_n
+                self.name = re.sub(r'\s+[-+]?[0-9]\d*(\.\d+)?\s+[-+]?[0-9]\d*(\.\d+)?\s*$','', self.text)
             else:
-                self.qty_ = last_n
-                self.name_ = re.sub(r'\s+[-+]?[0-9]\d*(\.\d+)?\s*$','', self.text)
+                self.qty = last_n
+                self.name = re.sub(r'\s+[-+]?[0-9]\d*(\.\d+)?\s*$','', self.text)
         else:
-            self.name_ = self.text
+            self.name = self.text
 
-    @property
-    def name(self):
-        if self.name_:
-            return self.name_
-        self.parse_text()
-        return self.name_
-    @property
-    def qty(self):
-        if self.qty_:
-            return self.qty_
-        self.parse_text()
-        return self.qty_
-    @property
-    def price(self):
-        if self.price_:
-            return self.price_
-        self.parse_text()
-        return self.price_
     @property
     def cost(self):
         return self.qty*self.price
+
     class Meta:
         ordering = ('id',)
         unique_together = ('list', 'text')
