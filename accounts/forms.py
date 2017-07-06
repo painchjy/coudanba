@@ -1,5 +1,4 @@
 from django import forms
-from multi_email_field.forms import MultiEmailField
 from django.core.mail import send_mail
 from django.contrib import auth, messages
 from accounts.models import Token
