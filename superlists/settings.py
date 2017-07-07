@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'lists',
     'accounts',
     'functional_tests',
-    'multi_email_field',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
