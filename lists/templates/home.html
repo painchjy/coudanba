@@ -1,10 +1,5 @@
 {% extends 'base.html' %}
 {% block header_text %}
-  {% if current_ju %}
-    凑单地点：{{ current_ju.address }}<br/>
-    截止时间：{{current_ju.stop_date }}
-  {% else %}
       不和别人凑，自己凑着玩！
-  {% endif %}
 {% endblock %}
-{% block form_action %}{% url 'home' %}{%endblock %}
+{% block form_action %}{% url 'new_list' %}{%endblock %}

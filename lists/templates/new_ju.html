@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block header_text %}新建凑单活动{% endblock %}
-{% block form_action %} {% url 'manage_jus' owner.email %} {% endblock %}
+{% block form_action %} {% url 'new_ju' %} {% endblock %}
 {% block submit_button %}<br/><input type="submit" value="Submit"> {% endblock %}
 {% block extra_content %}
     <h2>账号：{{ owner.email }}创建的活动</h2>

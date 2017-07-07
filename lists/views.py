@@ -8,7 +8,8 @@ from django.core.urlresolvers import reverse
 import csv
 User = get_user_model()
 
-# Create your views here.
+# list the ju's orders, all list owner's  department  
+# should be as same as the request user
 def view_ju(request, ju_id):
     ju = Ju.objects.get(id = ju_id)
     owner = request.user
@@ -16,11 +17,14 @@ def view_ju(request, ju_id):
         return render(request, 'view_ju.html', { 'current_ju': ju,  'owner': owner})
     return redirect('/')
 
+# ju's onwner can modify ju's content
+# the url should type manually in browser
 def manage_ju(request, ju_id):
     ju = Ju.objects.get(id = ju_id)
     if ju.owner:
         if request.user != ju.owner:
-            return view_ju(request, ju_id)
+            return redirect(ju)
+            # return view_ju(request, ju_id)
 
     form = JuItemForm()
     form.fields['content'].initial = ju.content
@@ -28,13 +32,39 @@ def manage_ju(request, ju_id):
     if request.method == 'POST':
         form = JuItemForm(data=request.POST)
         if form.is_valid():
-            saved_ju = form.save(owner=ju.owner, ju=ju)
-            if saved_ju:
-                return redirect(saved_ju)
+            form.save(owner=ju.owner, ju=ju)
     return render(request, 'manage_ju.html', { 'current_ju': ju,  'form': form})
 
-def manage_jus(request, email):
-    owner = User.objects.get(email=email)
+def order(request, ju_id):
+    try:
+        current_ju = Ju.objects.get(id=ju_id)
+    except :
+        return redirect ('/')
+
+    if current_ju and request.user.is_authenticated :
+        try:
+            list_ = List.objects.get(ju = current_ju, owner = request.user) 
+            return redirect(list_)
+        # need test two cases:
+        # 1.NotExists
+        # 2.More than one list returned
+        except:
+            pass
+
+    form = NewListForm(data=request.POST)
+    if current_ju.status != 'active':
+        form.fields['text'].widget.attrs['readonly'] = True 
+    if form.is_valid():
+        list_ = form.save(
+            owner=request.user if request.user.is_authenticated else None, 
+            ju=current_ju
+        )
+        if list_:
+            return redirect(list_)
+    return render(request, 'new_order.html', {'form': form, 'current_ju': current_ju })
+
+def new_ju(request):
+    owner = request.user
     form = JuItemForm()
     if request.method == 'POST':
         form = JuItemForm(data=request.POST)
@@ -42,35 +72,38 @@ def manage_jus(request, email):
             ju = form.save(owner=owner)
             if ju:
                 return redirect(ju)
-    return render(request, 'manage_jus.html', {'form': form, 'owner': owner})
+    return render(request, 'new_ju.html', {'form': form, 'owner': owner})
 
 def list_jus(request):
+    #active_jus = Ju.objects.filter(status='active')
+    #unactive_jus = Ju.objects.filter(status='active')
+    list_dict = dict(
+        [(list.ju.id, list)  for list in List.objects.filter(
+            owner=request.user,
+            ju__isnull=False
+    )])
     if request.user.is_authenticated:
-        return render(request, 'list_jus.html', { 'owner': request.user})
+        return render(
+            request,
+            'list_jus.html', 
+            { 'owner': request.user, 'jus': Ju.objects.all, 'list_dict': list_dict}
+        )
     return redirect('/')
 
 def my_lists(request, email):
-    owner = User.objects.get(email=email)
-    return render(request, 'my_lists.html', {'owner': owner})
+    try:
+        owner = User.objects.get(email=email)
+        return render(request, 'my_lists.html', {'owner': owner})
+    except User.DoesNotExists:
+        return redirect('/')
 
 def home_page(request):
     current_ju = Ju.active_ju()
     email_input_form = EmailInputForm()
-    if current_ju and request.user.is_authenticated :
-        try:
-            list_ = List.objects.get(ju = current_ju, owner = request.user) 
-            return redirect(list_)
-        except:
-            pass
-
     form = NewListForm()
-    if not current_ju:
-        form.fields['text'].widget.attrs['placeholder'] = '怎么填都行'
-    if request.method == 'POST':
-        if current_ju:
-            return new_order(request)
-        else:
-            return new_list(request)
+    if current_ju:
+        return order(request, current_ju.id)
+    form.fields['text'].widget.attrs['placeholder'] = '怎么填都行'
     return render(request, 'home.html', {'form': form, 'current_ju': current_ju, 'email_input_form': email_input_form})
 
 
@@ -100,15 +133,7 @@ def new_list(request):
             return redirect(list_)
     return render(request, 'home.html', {'form': form })
 
-def new_order(request):
-    form = NewListForm(data=request.POST)
-    current_ju = Ju.active_ju()
-    if form.is_valid():
-        list_ = form.save(owner=request.user if request.user.is_authenticated else None, ju=current_ju)
-        if list_:
-            return redirect(list_)
-    return render(request, 'home.html', {'form': form, 'current_ju': current_ju })
-
+# type url manually ! '/lists/load_users/{ju_id}
 def load_users(request, ju_id):
     ju = Ju.objects.get(id = ju_id)
     if ju.owner:

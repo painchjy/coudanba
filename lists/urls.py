@@ -23,7 +23,8 @@ urlpatterns = [
     url(r'^users/(.+)/$',views.my_lists, name='my_lists' ),
     url(r'^loadusers/(\d+)/$',views.load_users, name='load_users' ),
     url(r'^manage_ju/(\d+)/$',views.manage_ju, name='manage_ju' ),
+    url(r'^order/(\d+)/$',views.order, name='order' ),
     url(r'^jus/(\d+)/$',views.view_ju, name='view_ju' ),
-    url(r'^jus/(.+)/$',views.manage_jus, name='manage_jus' ),
+    url(r'^jus/new/$',views.new_ju, name='new_ju' ),
     url(r'^jus/$',views.list_jus, name='list_jus' ),
 ]
