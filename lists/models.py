@@ -69,6 +69,11 @@ class Ju(models.Model):
         return self.status_
 
     @property
+    def is_active(self):
+        if self.status == 'active':
+            return True
+        return False
+    @property
     def items(self):
         if not self.items_:
             self.parse_content()

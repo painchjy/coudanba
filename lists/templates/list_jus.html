@@ -18,7 +18,15 @@
 		<td style='text-align: right'>{{ju.status}}</td>
 		<td style='text-align: right'>{{ju.created_at|date:'Y-m-d H:i'}}</td>
 		<td style='text-align: right'>{{ju.owner.display_name}}</td>
-		<td style='text-align: center'><a href="{% url 'order' ju.id %}">下单{{cost}}</a></td>
+		<td style='text-align: center'>
+		    <a href="{% url 'order' ju.id %}">
+		    {% if ju.is_active %}
+				下单
+		    {% else %}
+		    		查看
+		    {% endif %}
+		    </a>
+		</td>
 	</tr>
 	{% endfor %}
 	<tr>

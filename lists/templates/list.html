@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
-
 {% block header_text %}
-  {% if current_ju %}
-    凑单地点：{{ current_ju.address }}<br/>
-    截止时间：{{current_ju.stop_date }}
+  {% if list.ju %}
+    活动说明：{{ list.ju.address }}<br/>
+    截止时间：{{ list.ju.stop_date }}
   {% else %}
       凑着玩:{{ list.name }}
   {% endif %}

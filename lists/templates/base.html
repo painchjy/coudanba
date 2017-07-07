@@ -19,7 +19,7 @@
 		      </ul>
 		      <ul class="nav navbar-nav navbar-right">
 			<li class="navbar-text">群组：{{user.depart_name}} </li>
-			<li class="navbar-text">账号： {{ user.email }} </li>
+			<li class="navbar-text">账号： {{ user.display_name }} </li>
 			<li><a href="{% url 'user_invite' %}">邀请</a></li>
 			<li><a href="{% url 'logout' %}">注销</a></li>
 		      </ul>

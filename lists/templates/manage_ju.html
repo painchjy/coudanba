@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block header_text %}
-凑单活动说明：{{ current_ju.address }}<br/>
+活动说明：{{ current_ju.address }}<br/>
 截止时间：{{current_ju.stop_date }}
 {% endblock %}
 {% block form_action %} {% url 'manage_ju' current_ju.id %} {% endblock %}

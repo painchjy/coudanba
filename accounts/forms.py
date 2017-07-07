@@ -76,7 +76,7 @@ class UserInviteForm(EmailInputForm):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             if re.findall('@bankcomm.com', email):
-                user = User.objects.create(email=email)
+                user = User.objects.create(email=email, display_name=email.split('@')[0])
             else:
                 messages.warning(
                     request,
