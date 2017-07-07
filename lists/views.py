@@ -101,7 +101,7 @@ def home_page(request):
     current_ju = Ju.active_ju()
     email_input_form = EmailInputForm()
     form = NewListForm()
-    if current_ju:
+    if current_ju and request.user.is_authenticated:
         return order(request, current_ju.id)
     form.fields['text'].widget.attrs['placeholder'] = '怎么填都行'
     return render(request, 'home.html', {'form': form, 'current_ju': current_ju, 'email_input_form': email_input_form})
