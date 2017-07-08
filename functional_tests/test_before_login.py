@@ -14,7 +14,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('凑单吧',self.browser.title)
         
         header_text = self.browser.find_element_by_tag_name('h2').text  
-        self.assertIn('不和别人凑，自己凑着玩！', header_text)
+        self.assertIn('自己凑个采购单！', header_text)
 
         
     def test_new_user_can_see_active_ju_but_can_not_new_orders(self):
@@ -24,10 +24,10 @@ class NewVisitorTest(FunctionalTest):
         self.browser.get(self.live_server_url)
         # She notices the page title and header mention 凑单吧
         self.assertIn('凑单吧',self.browser.title)
-        
+        self.browser.find_element_by_link_text('看看别人在凑什么').click()
         time.sleep(2)
         header_text = self.browser.find_element_by_tag_name('h2').text  
-        self.assertIn('凑单地点', header_text)
+        self.assertIn('活动说明', header_text)
         
 
         self.assertIn('截止时间', header_text)

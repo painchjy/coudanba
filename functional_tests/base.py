@@ -7,6 +7,7 @@ import os
 from .server_tools import reset_database, create_session_on_server
 from selenium.webdriver.common.keys import Keys
 from lists.models import Ju
+from accounts.models import User
 import json
 from fixtures.ju import FIXTURE_JU_CONTENT
 from .management.commands.create_session import create_pre_authenticated_session
@@ -34,6 +35,10 @@ class FunctionalTest(StaticLiveServerTestCase):
     def load_fixture_ju(self):
         # create first ju content before test
         return Ju.objects.create(content=FIXTURE_JU_CONTENT)
+
+    def load_fixture_user(self, email):
+        # create first ju content before test
+        return User.objects.create(email=email, display_name=email.split('@')[0])
 
     def tearDown(self):
         self.browser.quit()
@@ -94,7 +99,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     def wait_to_be_logged_in(self, email):
         self.browser.find_elements_by_link_text('Log out')
         navbar = self.browser.find_element_by_css_selector('.navbar')
-        self.assertIn(email, navbar.text)
+        self.assertIn(email.split('@')[0], navbar.text)
 
     @wait
     def wait_to_be_logged_out(self, email):
@@ -102,10 +107,12 @@ class FunctionalTest(StaticLiveServerTestCase):
         navbar = self.browser.find_element_by_css_selector('.navbar')
         t = navbar.text
 
-        self.assertNotIn(email, t)
+        self.assertNotIn(email.split('@')[0], t)
 
     def get_item_input_box(self):
-        return self.browser.find_element_by_id('id_text')
+        return self.get_item_input_box_by_id('id_text')
+    def get_item_input_box_by_id(self,id):
+        return self.browser.find_element_by_id(id)
     def get_error_element(self):
         return self.browser.find_element_by_css_selector('.has-error')
 

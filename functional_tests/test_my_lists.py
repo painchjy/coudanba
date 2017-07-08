@@ -7,10 +7,10 @@ User = get_user_model()
 
 class MyListsTest(FunctionalTest):
 
-
     @skip
     def test_logged_in_users_lists_are_saved_as_my_lists(self):
         email = 'edith@example.com'
+        self.load_fixture_user(email=email)
         self.browser.get(self.live_server_url)
         self.wait_to_be_logged_out(email)
 
@@ -64,6 +64,7 @@ class MyListsTest(FunctionalTest):
         
     def test_users_cannot_open_other_users_list_by_url(self):
         email = 'edith@example.com'
+        self.load_fixture_user(email=email)
         self.browser.get(self.live_server_url)
         self.wait_to_be_logged_out(email)
 
@@ -86,6 +87,7 @@ class MyListsTest(FunctionalTest):
         self.assertEqual(self.browser.current_url, self.live_server_url + '/')
 
         email = 'blink@example.com'
+        self.load_fixture_user(email=email)
         self.create_pre_authenticated_session(email)
         self.browser.get(self.live_server_url)
         self.wait_to_be_logged_in(email)
@@ -96,6 +98,7 @@ class MyListsTest(FunctionalTest):
 
     def test_a_list_without_owner_can_be_open_by_anyone_by_url(self):
         email = 'edith@example.com'
+        self.load_fixture_user(email=email)
         self.browser.get(self.live_server_url)
         self.wait_to_be_logged_out(email)
         self.add_list_item('Reticulate splines')

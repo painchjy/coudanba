@@ -18,7 +18,7 @@ class NewVisitorTest(FunctionalTest):
 
         # She is invited to make her first order
         inputbox = self.get_item_input_box()
-        self.assertEqual(
+        self.assertIn(
             '怎么填都行',
             inputbox.get_attribute('placeholder'),
             "Attribute placeholder for the inputbox not exists or not set the correct value"
@@ -50,6 +50,7 @@ class NewVisitorTest(FunctionalTest):
         # to check its homepage, try to make orders
         ## self.browser.get('http://localhost:8000') ## 要使用测试库，要通过live_server_url访问,测试环境使用8081端口
         email = 'edith@example.com'
+        self.load_fixture_user(email)
         # Edith is a logged-in user
         session_key = self.create_pre_authenticated_session(email)
         active_ju = self.load_fixture_ju()

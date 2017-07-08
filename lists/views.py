@@ -39,7 +39,8 @@ def order(request, ju_id):
     try:
         current_ju = Ju.objects.get(id=ju_id)
     except :
-        return redirect ('/')
+        current_ju = Ju.active_ju
+        return render_home_page(request, current_ju)
 
     if current_ju and request.user.is_authenticated :
         try:
@@ -51,17 +52,24 @@ def order(request, ju_id):
         except:
             pass
 
-    form = NewListForm(data=request.POST)
+    form = NewListForm()
     if current_ju.status != 'active':
         form.fields['text'].widget.attrs['readonly'] = True 
-    if form.is_valid():
-        list_ = form.save(
-            owner=request.user if request.user.is_authenticated else None, 
-            ju=current_ju
-        )
-        if list_:
-            return redirect(list_)
-    return render(request, 'new_order.html', {'form': form, 'current_ju': current_ju })
+    if request.method == 'POST':
+        form = NewListForm(data=request.POST)
+        if form.is_valid():
+            list_ = form.save(
+                owner=request.user if request.user.is_authenticated else None, 
+                ju=current_ju
+            )
+            if list_:
+                return redirect(list_)
+    email_input_form = EmailInputForm()
+    return render(
+        request, 
+        'new_order.html', 
+        {'form': form, 'current_ju': current_ju, 'email_input_form': email_input_form }
+    )
 
 def new_ju(request):
     owner = request.user
@@ -99,12 +107,16 @@ def my_lists(request, email):
 
 def home_page(request):
     current_ju = Ju.active_ju()
-    email_input_form = EmailInputForm()
-    form = NewListForm()
-    if current_ju and request.user.is_authenticated:
+
+    if request.user.is_authenticated and current_ju:
         return order(request, current_ju.id)
-    form.fields['text'].widget.attrs['placeholder'] = '怎么填都行'
-    return render(request, 'home.html', {'form': form, 'current_ju': current_ju, 'email_input_form': email_input_form})
+    return render_home_page(request, current_ju)
+
+def render_home_page(request, ju):
+    form = NewListForm()
+    form.fields['text'].widget.attrs['placeholder'] = '怎么填都行，试试看：橙子1斤 2.5'
+    email_input_form = EmailInputForm()
+    return render(request, 'home.html', {'form': form, 'current_ju': ju, 'email_input_form': email_input_form})
 
 
 def view_list(request, list_id):
@@ -122,7 +134,12 @@ def view_list(request, list_id):
         if form.is_valid():
             if form.save():
                 return redirect(list_)
-    return render(request, 'list.html', { 'list': list_,  'form': form, 'current_ju': list_.ju})
+    email_input_form = EmailInputForm()
+    return render(
+        request, 
+        'list.html', 
+        { 'list': list_,  'form': form, 'current_ju': list_.ju, 'email_input_form': email_input_form}
+    )
 
 def new_list(request):
     form = NewListForm(data=request.POST)

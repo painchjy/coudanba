@@ -18,8 +18,10 @@ class Ju(models.Model):
         self.items_ = None
         self.sorted_items_ = None
 
+    
     content = models.TextField(default='')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    stop_date = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
