@@ -3,7 +3,7 @@ from unittest import skip
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
-from lists.models import Ju
+from jus.models import Ju
 
 class NewVisitorTest(FunctionalTest):
     def test_new_user_can_see_error_with_no_active_ju(self):

@@ -1,5 +1,5 @@
 from django import forms
-from lists.models import Item, List, Ju
+from lists.models import Item, List
 from django.core.exceptions import ValidationError
 import shlex
 import re
@@ -31,42 +31,6 @@ class ItemForm(forms.models.ModelForm):
         error_messages = {
                 'text': {'required': EMPTY_ITEM_ERROR,'max_length': TOO_LONG_ERROR }
         }
-
-class JuItemForm(forms.models.ModelForm):
-
-    class Meta:
-        model = Ju
-        fields = ('content',)
-        widgets = {
-            'content': forms.Textarea(attrs={
-                'placeholder': '#@!@#$$%%#',
-                'class': 'form-control input-lg',
-            }),
-        }
-        error_messages = {
-            'content': {'required': EMPTY_ITEM_ERROR }
-        }
-
-    def save(self, owner=None, ju=None):
-        item_text=self.cleaned_data['content']
-        if ju:
-            ju.content = item_text
-        else:
-            ju =Ju(content=item_text, owner=owner)    
-        if ju.parse_content():
-            ju.save()
-            return ju
-        self.add_error('content', JU_FORMAT_ERROR)
-
-    def load_users(self):
-
-        f = self.cleaned_data['content']
-        for line in f.splitlines():
-            row = line.split(';')
-            user, created = User.objects.update_or_create(
-                email=row[0],
-                defaults={'depart_name': row[1]},
-            )
 
 class ExistingListItemForm(ItemForm):
     def __init__(self, for_list, *args, **kwargs):

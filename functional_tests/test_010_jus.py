@@ -36,7 +36,7 @@ class JuLifeCycleTest(FunctionalTest):
         # Edith is a logged-in user
         session_key = self.create_pre_authenticated_session(email)
 
-        self.browser.get(self.live_server_url + '/lists/jus/new/')
+        self.browser.get(self.live_server_url + '/jus/new/')
         self.wait_to_be_logged_in(email)
         
         inputbox = self.get_item_input_box_by_id('id_content')

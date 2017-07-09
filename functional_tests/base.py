@@ -6,7 +6,7 @@ import time
 import os
 from .server_tools import reset_database, create_session_on_server
 from selenium.webdriver.common.keys import Keys
-from lists.models import Ju
+from jus.models import Ju
 from accounts.models import User
 import json
 from fixtures.ju import FIXTURE_JU_CONTENT

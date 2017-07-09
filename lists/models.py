@@ -20,7 +20,7 @@ class Ju(models.Model):
 
     
     content = models.TextField(default='')
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='lists_ju_owner')
     stop_date = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -101,7 +101,7 @@ class Ju(models.Model):
 
 class List(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
-    ju = models.ForeignKey(Ju, blank=True, null=True)
+    ju = models.ForeignKey('jus.Ju', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
