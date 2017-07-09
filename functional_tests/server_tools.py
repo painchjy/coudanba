@@ -8,6 +8,7 @@ def reset_database(host):
     manage_dot_py = _get_manage_dot_py(host)
     with settings(host_string=f'painchjy@{host}', port=27627):
         run(f'{manage_dot_py} flush --noinput')
+        run(f'{manage_dot_py} loaddata ~/sites/{host}/source/fixtures/users.json')
         
 def create_session_on_server(host, email):
     manage_dot_py = _get_manage_dot_py(host)

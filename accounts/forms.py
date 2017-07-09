@@ -35,7 +35,7 @@ class EmailInputForm(forms.Form):
         url = request.build_absolute_uri(
             reverse('login') + '?token=' + str(token.uid)
         )
-        message_body = f'请使用以下链接登录凑单吧：\n\n{url}'
+        message_body = f'请使用以下链接登录凑单吧：\n\n Click Login URL below:\n\n{url}'
         send_mail(
             'Login URL from www.coudanba.cn',
             message_body,
