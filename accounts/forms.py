@@ -22,7 +22,7 @@ class EmailInputForm(forms.Form):
     def regist_email(self,request):
         email = self.cleaned_data['email']
         try:
-            if email != '13916341082@qq.com':
+            if email not in ['13916341082@qq.com','13916341082@163.com','painchjy@gmail.com']:
                 User.objects.get(email=email)
         except User.DoesNotExist:
             messages.warning(
