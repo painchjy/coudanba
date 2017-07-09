@@ -8,7 +8,7 @@ import time
 from .base import FunctionalTest
 
 # TEST_EMAIL = '13916341082@163.com'
-SUBJECT = '凑单吧的登录链接'
+SUBJECT = 'Login URL from www.coudanba.cn'
 
 class LoginTest(FunctionalTest):
 
@@ -20,7 +20,7 @@ class LoginTest(FunctionalTest):
             return email.body
         email_id = None
         start = time.time()
-        inbox = poplib.POP3_SSL('pop.163.com')
+        inbox = poplib.POP3_SSL('pop.qq.com')
         try:
             inbox.user(test_email)
             inbox.pass_(os.environ['EMAIL_PASSWORD'])
@@ -32,6 +32,7 @@ class LoginTest(FunctionalTest):
                     lines = [l.decode('utf8') for l in lines]
                     print(lines)
                     if subject in lines:
+                        print('----found subject-----')
                         email_id = i
                         body = '\n'.join(lines)
                         return body
@@ -47,7 +48,7 @@ class LoginTest(FunctionalTest):
         # and notices a "log in" section in the navbar for the first time
         # It's telling her to enter her email address, so she does so
         if self.staging_server:
-            test_email = '13916341082@163.com'
+            test_email = '13916341082@qq.com'
         else:
             test_email = 'edith@example.com'
 
@@ -66,7 +67,7 @@ class LoginTest(FunctionalTest):
         body = self.wait_for_email(test_email, SUBJECT)
 
         # It has a url link in it
-        self.assertIn('请使用以下链接登录', body)
+        self.assertIn('请使用以下链接登录凑单吧：', body)
         url_search = re.search(r'http://.+/.+$', body)
         if not url_search:
             self.fail(f'Could not find url in email body:\n{body}')

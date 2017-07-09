@@ -12,7 +12,7 @@ import json
 from fixtures.ju import FIXTURE_JU_CONTENT
 from .management.commands.create_session import create_pre_authenticated_session
 
-MAX_WAIT = 10
+MAX_WAIT = 30
 
 class FunctionalTest(StaticLiveServerTestCase):
     
