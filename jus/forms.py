@@ -1,6 +1,6 @@
 from django import forms
-from lists.models import Item, List
-from jus.models import Ju
+from lists.models import Item as ListItem, List
+from jus.models import Ju, Item
 from django.core.exceptions import ValidationError
 import shlex
 import re
@@ -36,6 +36,26 @@ class JuItemForm(forms.models.ModelForm):
             ju =Ju(content=item_text, owner=owner)    
         if ju.parse_content():
             ju.save()
+            for k, v in ju.sorted_items_:
+                item = ju.item_set.filter(key=k).first()
+                if item:
+                    if item.price != float(v['price']):
+                        item.price = float(v['price'])
+                        ListItem.objects.filter(list__ju=ju, text__istartswith=k).update(price=item.price)
+                else:
+                    item = Item(ju=ju, key=k, desc=v['desc'], price=v['price'])
+
+                try:
+                    item.href = v['href']
+                    item.unit = v['unit']
+                    item.min_qty = v['min_qty']
+                    item.max_qty = v['max_qty']
+                    item.min_total_qty = v['min_total_qty']
+                    item.max_total_qty = v['max_total_qty']
+                except Exception as e:
+                    print('-----------Exception for updating JuItem:{}'.format(e))
+                    pass
+                item.save()
             return ju
         self.add_error('content', JU_FORMAT_ERROR)
 

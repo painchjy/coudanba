@@ -38,7 +38,7 @@ class Ju(models.Model):
         try:
             j = json.loads(self.content)
             self.address = j['address']
-            # self.stop_date = j['stop_date']
+            self.stop_date = j['stop_date']
             self.status = j['status']
             self.items_ = j['items']
             self.sorted_items_ = sorted(self.items_.items())
@@ -49,27 +49,9 @@ class Ju(models.Model):
                         text__istartswith=k
                 ))
                 self.items_[k].update({'qty_sum': qty_sum})
-                item = self.item_set.filter(key=k).first()
-                if item:
-                    if item.price != float(v['price']):
-                        item.price = float(v['price'])
-                        ListItem.objects.filter(list__ju=self, text__istartswith=k).update(price=item.price)
-                else:
-                    item = Item(ju=self, key=k, desc=v['desc'], price=v['price'])
-
-                try:
-                    item.href = v['href']
-                    item.unit = v['unit']
-                    item.min_qty = v['min_qty']
-                    item.max_qty = v['max_qty']
-                    item.min_total_qty = v['min_total_qty']
-                    item.max_total_qty = v['max_total_qty']
-                except:
-                    pass
-                item.save()
-
-            self.sorted_items_ = sorted(self.items_.items())
-        except (JSONDecodeError, ValueError, KeyError):
+                self.sorted_items_ = sorted(self.items_.items())
+        except (JSONDecodeError, ValueError, KeyError) as e:
+            print('------Exception:{}'.format(e))
             return False
         return True
     @property
