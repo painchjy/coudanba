@@ -34,7 +34,10 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def load_fixture_ju(self):
         # create first ju content before test
-        return Ju.objects.create(content=FIXTURE_JU_CONTENT)
+        ju = Ju.objects.create(content=FIXTURE_JU_CONTENT)
+        ju.parse_content()
+        ju.save()
+        return ju
 
     def load_fixture_user(self, email):
         # create first ju content before test
@@ -73,20 +76,20 @@ class FunctionalTest(StaticLiveServerTestCase):
     def wait_for_row_in_list_table(self, row_text):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('{} 0.00 0.00 0.00'.format(row_text), [row.text for row in rows])
+        self.assertIn('{} 0.00 0.00 0.00'.format(row_text.upper()), [row.text for row in rows])
 
     @wait
     def wait_for_row_order_in_list_table(self, cd, qty, price, cost):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        row_text = '{} {:.2f} {:.2f} {:.2f}'.format(cd,qty,price,cost)
+        row_text = '{} {:.2f} {:.2f} {:.2f}'.format(cd.upper(),qty,price,cost)
         self.assertIn(row_text, [row.text for row in rows])
 
     @wait
     def wait_for_row_order_not_in_list_table(self, cd, qty, price, cost):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        row_text = '{} {:.2f} {:.2f} {:.2f}'.format(cd,qty,price,cost)
+        row_text = '{} {:.2f} {:.2f} {:.2f}'.format(cd.upper(),qty,price,cost)
         self.assertNotIn(row_text, [row.text for row in rows])
 
     @wait

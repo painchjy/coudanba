@@ -13,17 +13,12 @@ User = get_user_model()
 def view_ju(request, ju_id):
     ju = Ju.objects.get(id = ju_id)
     owner = request.user
-    if request.user.is_authenticated:
-        return render(request, 'view_ju.html', { 'current_ju': ju,  'owner': owner})
-    return redirect('/')
+    if not request.user.is_authenticated:
+        return redirect('/')
 
-# ju's onwner can modify ju's content
-# the url should type manually in browser
-def manage_ju(request, ju_id):
-    ju = Ju.objects.get(id = ju_id)
     if ju.owner:
         if request.user != ju.owner:
-            return redirect(ju)
+            return render(request, 'view_ju.html', { 'current_ju': ju,  'owner': owner})
             # return view_ju(request, ju_id)
 
     form = JuItemForm()

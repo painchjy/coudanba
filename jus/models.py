@@ -7,70 +7,74 @@ import json
 import shlex
 import re
 from json.decoder import JSONDecodeError
-from lists.models import Item 
+from lists.models import Item  as ListItem
 
+class Product(models.Model):
+   
+    name = models.CharField(default='', max_length=300)
+    desc = models.TextField(default='')
+    href = models.TextField(default='')
+    status = models.CharField(default='', max_length=30)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
 class Ju(models.Model):
     def __init__(self, *args, **kwargs):
         super(Ju, self).__init__(*args, **kwargs)
-        self.name_ = None
-        self.address_ = None
-        self.stop_date_ = None
-        self.status_ = None
         self.items_ = None
         self.sorted_items_ = None
 
     
-    content = models.TextField(default='')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
-    stop_date = models.DateTimeField(blank=True, null=True)
+    content = models.TextField(default='')
+    address = models.CharField(default='', max_length=300)
+    status = models.CharField(default='', max_length=30)
+    # stop_date = models.DateTimeField(blank=True, null=True)
+    stop_date = models.CharField(default='', max_length=30)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def parse_content(self):
         try:
             j = json.loads(self.content)
-            self.name_ = j['address']+j['stop_date']
-            self.address_ = j['address']
-            self.stop_date_ = j['stop_date']
-            self.status_ = j['status']
+            self.address = j['address']
+            # self.stop_date = j['stop_date']
+            self.status = j['status']
             self.items_ = j['items']
             self.sorted_items_ = sorted(self.items_.items())
             for k, v in self.sorted_items_:
                 qty_sum = sum(
-                    i.qty for i in Item.objects.filter(
+                    i.qty for i in ListItem.objects.filter(
                         list__ju=self, 
                         text__istartswith=k
                 ))
                 self.items_[k].update({'qty_sum': qty_sum})
+                item = self.item_set.filter(key=k).first()
+                if item:
+                    if item.price != float(v['price']):
+                        item.price = float(v['price'])
+                        ListItem.objects.filter(list__ju=self, text__istartswith=k).update(price=item.price)
+                else:
+                    item = Item(ju=self, key=k, desc=v['desc'], price=v['price'])
+
+                try:
+                    item.href = v['href']
+                    item.unit = v['unit']
+                    item.min_qty = v['min_qty']
+                    item.max_qty = v['max_qty']
+                    item.min_total_qty = v['min_total_qty']
+                    item.max_total_qty = v['max_total_qty']
+                except:
+                    pass
+                item.save()
+
             self.sorted_items_ = sorted(self.items_.items())
         except (JSONDecodeError, ValueError, KeyError):
             return False
         return True
     @property
     def name(self):
-        if not self.name_:
-            self.parse_content()
-        return self.name_
-
-
-    @property
-    def address(self):
-        if not self.address_:
-            self.parse_content()
-        return self.address_
-
-    @property
-    def stop_date(self):
-        if not self.stop_date_:
-            self.parse_content()
-        return self.stop_date_
-
-    @property
-    def status(self):
-        if not self.status_:
-            self.parse_content()
-        return self.status_
-
+        return '{}:{}'.format(self.address, self.stop_date)
     @property
     def is_active(self):
         if self.status == 'active':
@@ -99,4 +103,20 @@ class Ju(models.Model):
 
     class Meta:
         ordering = ('-updated_at', )
+
+class Item(models.Model):
+    
+    key = models.CharField(default='', max_length=30)
+    ju = models.ForeignKey(Ju, blank=True, null=True)
+    product = models.ForeignKey(Product, blank=True, null=True)
+    price = models.FloatField(default=0.0)
+    desc = models.TextField(default='')
+    href = models.TextField(default='')
+    unit = models.FloatField(blank=True, null=True )
+    min_qty = models.FloatField(blank=True, null=True )
+    max_qty = models.FloatField(blank=True, null=True )
+    min_total_qty = models.FloatField(blank=True, null=True )
+    max_total_qty = models.FloatField(blank=True, null=True )
+    updated_at = models.DateTimeField(auto_now=True)
+
 

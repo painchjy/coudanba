@@ -20,10 +20,10 @@ class LoginTest(FunctionalTest):
             return email.body
         email_id = None
         start = time.time()
-        inbox = poplib.POP3_SSL('pop.163.com')
+        inbox = poplib.POP3_SSL('pop.qq.com')
         try:
             inbox.user(test_email)
-            inbox.pass_(os.environ['M163_PASSWORD'])
+            inbox.pass_(os.environ['EMAIL_PASSWORD'])
             while time.time() - start < 60:
                 count, _ = inbox.stat()
                 for i in reversed(range(max(1,count - 5), count +1 )):
@@ -48,7 +48,7 @@ class LoginTest(FunctionalTest):
         # and notices a "log in" section in the navbar for the first time
         # It's telling her to enter her email address, so she does so
         if self.staging_server:
-            test_email = '13916341082@163.com'
+            test_email = '13916341082@qq.com'
         else:
             test_email = 'edith@example.com'
 
