@@ -13,8 +13,8 @@ class NewVisitorTest(FunctionalTest):
         # She notices the page title and header mention 凑单吧
         self.assertIn('凑单吧',self.browser.title)
         
-        header_text = self.browser.find_element_by_tag_name('h2').text  
-        self.assertIn('自己凑个采购单！', header_text)
+        header_text = self.browser.find_element_by_tag_name('h3').text  
+        self.assertIn('自己凑', header_text)
 
         
     def test_new_user_can_see_active_ju_but_can_not_new_orders(self):

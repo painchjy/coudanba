@@ -19,7 +19,7 @@ class NewVisitorTest(FunctionalTest):
         # She is invited to make her first order
         inputbox = self.get_item_input_box()
         self.assertIn(
-            '怎么填都行',
+            '试试看',
             inputbox.get_attribute('placeholder'),
             "Attribute placeholder for the inputbox not exists or not set the correct value"
         )
@@ -30,7 +30,7 @@ class NewVisitorTest(FunctionalTest):
         # When she hits enter, the page updates, and now the page lists
         # Product A and  1 QTY shows in the list table
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_order_in_list_table('1: 车厘子', 1.5,129.9, 129.9*1.5)
+        self.wait_for_row_in_list_table('1: 车厘子', 1.5,129.9, 129.9*1.5)
 
         
         # There is still a text box inviting her to add another item. She
@@ -40,8 +40,8 @@ class NewVisitorTest(FunctionalTest):
         inputbox.send_keys(Keys.ENTER)
         
         # The page updates again, and now shows both items on her list
-        self.wait_for_row_order_in_list_table('1: 车厘子', 1.5,129.9, 129.9*1.5)
-        self.wait_for_row_order_in_list_table('2: T-shirt', 2,39, 39*2)
+        self.wait_for_row_in_list_table('1: 车厘子', 1.5,129.9, 129.9*1.5)
+        self.wait_for_row_in_list_table('2: T-shirt', 2,39, 39*2)
         
         # Satisfied, she goes back to sleep
     
@@ -86,7 +86,7 @@ class NewVisitorTest(FunctionalTest):
         # When she hits enter, the page updates, and now the page lists
         # Product A and  1 QTY shows in the list table
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_order_in_list_table('1: A', 1, active_ju.items['A']['price'],active_ju.items['A']['price'])
+        self.wait_for_row_in_orders_table({'A': '1'}, active_ju, email, 'N/A')
 
         
         # There is still a text box inviting her to add another item. She
@@ -96,8 +96,7 @@ class NewVisitorTest(FunctionalTest):
         inputbox.send_keys(Keys.ENTER)
         
         # The page updates again, and now shows both items on her list
-        self.wait_for_row_order_in_list_table('2: b', 1.5,active_ju.items['B']['price'], active_ju.items['B']['price']*1.5)
-        self.wait_for_row_order_in_list_table('1: A', 1, active_ju.items['A']['price'],active_ju.items['A']['price'])
+        self.wait_for_row_in_orders_table({'A':'1', 'B': '1.50'},active_ju, email, 'N/A')
         
         # There is still a text box inviting her to add another item. She
         # try to add and unexisted item "c 2" 
@@ -128,8 +127,7 @@ class NewVisitorTest(FunctionalTest):
 
 
         # The page shows what she saw yestoday
-        self.wait_for_row_order_in_list_table('2: b', 1.5,active_ju.items['B']['price'], active_ju.items['B']['price']*1.5)
-        self.wait_for_row_order_in_list_table('1: A', 1, active_ju.items['A']['price'],active_ju.items['A']['price'])
+        self.wait_for_row_in_orders_table({'A':'1', 'B': '1.50'},active_ju, email, 'N/A')
 
         # There is still a text box inviting her to add another item. She
         # want to change item b to "B 3" 
@@ -139,8 +137,8 @@ class NewVisitorTest(FunctionalTest):
         inputbox.send_keys(Keys.ENTER)
         
         # The page updates again, and now shows both items on her list
-        self.wait_for_row_order_in_list_table('2: B', 3,active_ju.items['B']['price'], active_ju.items['B']['price']*3)
-        self.wait_for_row_order_not_in_list_table('2: b', 1.5,active_ju.items['B']['price'], active_ju.items['B']['price']*1.5)
+        self.wait_for_row_in_orders_table({'A':'1', 'B': '3'},active_ju, email, 'N/A')
+        self.wait_for_row_not_in_orders_table({'B': '1.50'},active_ju, email, 'N/A')
         # Satisfied, she goes back to sleep
 
     def test_multiple_users_can_start_lists_at_different_urls(self):

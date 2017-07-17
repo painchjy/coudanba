@@ -7,6 +7,7 @@ from accounts.forms import EmailInputForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 import csv
 User = get_user_model()
 def order(request, ju_id):
@@ -58,18 +59,29 @@ def home_page(request):
         return order(request, current_ju.id)
     return render_home_page(request, current_ju)
 
+def next_ju(request, ju_id):
+    if ju_id:
+        current_ju = Ju.objects.filter(id=ju_id).first()
+        next_ = Ju.objects.filter(status='active', updated_at__lt=current_ju.updated_at).exclude(id=current_ju.id).first()
+        if next_:
+            return order(request, next_.id)
+    return render_home_page(request, Ju.active_ju())
+    
 def render_home_page(request, ju):
     form = NewListForm()
-    form.fields['text'].widget.attrs['placeholder'] = '怎么填都行，试试看：橙子1斤 2.5'
+    form.fields['text'].widget.attrs['placeholder'] = '试试看：橙子1斤 2 2.5'
     email_input_form = EmailInputForm()
-    return render(request, 'home.html', {'form': form, 'current_ju': ju, 'email_input_form': email_input_form})
+    return render(request, 'home.html', {'form': form, 'first_ju': ju, 'email_input_form': email_input_form})
 
 
 def view_list(request, list_id):
     list_ = List.objects.get(id = list_id)
+    orders = None
     if list_.owner:
-        if request.user != list_.owner:
+        if request.user != list_.owner and request.user != list_.agent:
             return redirect(reverse('home'))
+        if list_.ju:
+            orders = List.objects.filter(Q(ju=list_.ju) & (Q(owner=request.user)|Q(agent=request.user))) 
 
     form = ExistingListItemForm(for_list = list_)
     if list_.ju and list_.ju.status != 'active':
@@ -81,11 +93,18 @@ def view_list(request, list_id):
             if form.save():
                 return redirect(list_)
     email_input_form = EmailInputForm()
-    return render(
-        request, 
-        'list.html', 
-        { 'list': list_,  'form': form, 'current_ju': list_.ju, 'email_input_form': email_input_form}
-    )
+    if orders:
+        return render(
+            request, 
+            'list.html', 
+            { 'list': list_,'current_ju': list_.ju,  'form': form, 'orders': orders, 'email_input_form': email_input_form}
+        )
+    else:
+        return render(
+            request, 
+            'list.html', 
+            { 'list': list_,'current_ju': list_.ju,  'form': form, 'email_input_form': email_input_form}
+        )
 
 def new_list(request):
     form = NewListForm(data=request.POST)

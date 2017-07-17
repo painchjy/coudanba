@@ -27,6 +27,7 @@
 		      <form class="navbar-form navbar-right" method="POST" action="{% url 'send_login_email' %}">
 			<span>请用邮箱登录:</span>
 			{{ email_input_form.email }}
+			<input type="submit" class="btn btn-primary mx-sm-2" value="发送" />
 			{% csrf_token %}
 			  {% if email_input_form.errors %}
 			      <div class="form-group has-error">
@@ -55,9 +56,14 @@
 	    <div class="row">
 		<div class="col-md-6 col-md-offset-3 jumbotron">
 		    <div class="text-center">
-		        <h2>{% block header_text %}{% endblock %}</h2>
+		        <h3>{% block header_text %}{% endblock %}</h3>
 {% block ju_table %}
   {% if current_ju %}
+    <h3><a href={% url 'next_ju' current_ju.id %}>换一个活动</a></h3>
+    <h2>
+    活动说明：{{ current_ju.address }}<br/>
+    截止时间：{{ current_ju.stop_date }}
+    </h2>
     <table id="id_ju_table" class="table">
         <tr>
 		<th style='text-align: center;'>代号</th>
@@ -84,14 +90,16 @@
     </table>
   {% endif %}
 {% endblock %}
-			{% block list_form %}
-		          <form method="POST" action="{% block form_action %}{% endblock %}">
-			  {{ form.text }}
-			  {{ form.content }}
-			  {% block user_invite_form_inputs %}
-			  {% endblock %}
-			  {% block submit_button %}{% endblock %}
-		          {% csrf_token %}
+{% block list_form %}
+<form class="form-inline" method="POST" action="{% block form_action %}{% endblock %}">
+  {{ form.text }}
+{{ form.content }}
+{% block user_invite_form_inputs %}
+{% endblock %}
+{% if form %}
+<input type="submit" class="btn btn-primary mx-sm-2" value="提交"  style="vertical-align:-8px;" />
+{% endif %}
+{% csrf_token %}
 			  {% if form.errors %}
 			      <div class="form-group has-error">
 			  	<span class="help-block">

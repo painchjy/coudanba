@@ -76,9 +76,7 @@ class Ju(models.Model):
 
     @classmethod
     def active_ju(cls):
-        ju = cls.objects.first()
-        if ju and ju.status == 'active':
-            return ju
+        return cls.objects.filter(status='active').first()
 
     def get_absolute_url(self):
         return reverse('view_ju', args=[self.id])
@@ -100,5 +98,8 @@ class Item(models.Model):
     min_total_qty = models.FloatField(blank=True, null=True )
     max_total_qty = models.FloatField(blank=True, null=True )
     updated_at = models.DateTimeField(auto_now=True)
+
+    def total_qty(self):
+        return sum([i.qty for i in ListItem.objects.filter(list__ju=self.ju,name=self.key)])
 
 

@@ -73,24 +73,54 @@ class FunctionalTest(StaticLiveServerTestCase):
 
 
     @wait
-    def wait_for_row_in_list_table(self, row_text):
+    def wait_for_row_in_list_table(self, row_text, qty=0, price=0, cost=0):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('{} 0.00 0.00 0.00'.format(row_text.upper()), [row.text for row in rows])
+        s_qty = ' {:.2f}'.format(qty) if qty else ''
+        s_price = ' {:.2f}'.format(price) if price else ''
+        s_cost = ' {:.2f}'.format(cost) if cost else ' 0.00'
+        self.assertIn(
+            f'{row_text.upper()}{s_qty}{s_price}{s_cost}',
+            [row.text for row in rows]
+        )
 
     @wait
-    def wait_for_row_order_in_list_table(self, cd, qty, price, cost):
-        table = self.browser.find_element_by_id('id_list_table')
+    def wait_for_row_in_orders_table(self, values, ju, email, depart_name):
+        table = self.browser.find_element_by_id('id_orders_table')
         rows = table.find_elements_by_tag_name('tr')
-        row_text = '{} {:.2f} {:.2f} {:.2f}'.format(cd.upper(),qty,price,cost)
-        self.assertIn(row_text, [row.text for row in rows])
+        v = dict([(i,'') for i in ju.items.keys()])
+        v.update(values)
+        total_cost = '{:.2f}'.format(
+            sum([float(values[k])*ju.items[k]['price'] for k in values.keys()])
+        )
+        f_text = '} {'.join(sorted(ju.items.keys()))
+        row_text = ('{depart_name} {owner} {'+f_text+'} {total_cost}').format(
+            depart_name=depart_name,
+            owner=email.split('@')[0],
+            total_cost=total_cost, 
+            **v
+        )
+        self.assertIn(' '.join(row_text.split()), [row.text for row in rows])
 
     @wait
-    def wait_for_row_order_not_in_list_table(self, cd, qty, price, cost):
-        table = self.browser.find_element_by_id('id_list_table')
+    def wait_for_row_not_in_orders_table(self, values, ju, email, depart_name):
+        table = self.browser.find_element_by_id('id_orders_table')
         rows = table.find_elements_by_tag_name('tr')
-        row_text = '{} {:.2f} {:.2f} {:.2f}'.format(cd.upper(),qty,price,cost)
-        self.assertNotIn(row_text, [row.text for row in rows])
+        v = dict([(i,'') for i in ju.items.keys()])
+        v.update(values)
+        total_cost = '{:.2f}'.format(
+            sum([float(values[k])*ju.items[k]['price'] for k in values.keys()])
+        )
+        f_text = '} {'.join(sorted(ju.items.keys()))
+        row_text = ('{depart_name} {owner} {'+f_text+'} {total_cost}').format(
+            depart_name=depart_name,
+            owner=email.split('@')[0],
+            total_cost=total_cost, 
+            **v
+        )
+        self.assertNotIn(' '.join(row_text.split()), [row.text for row in rows])
+
+
 
     @wait
     def wait_for_row_in_ju_table(self, row_text):

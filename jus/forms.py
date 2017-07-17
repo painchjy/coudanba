@@ -43,18 +43,12 @@ class JuItemForm(forms.models.ModelForm):
                         item.price = float(v['price'])
                         ListItem.objects.filter(list__ju=ju, text__istartswith=k).update(price=item.price)
                 else:
-                    item = Item(ju=ju, key=k, desc=v['desc'], price=v['price'])
+                    item = Item(ju=ju, key=k)
 
                 try:
-                    item.href = v['href']
-                    item.unit = v['unit']
-                    item.min_qty = v['min_qty']
-                    item.max_qty = v['max_qty']
-                    item.min_total_qty = v['min_total_qty']
-                    item.max_total_qty = v['max_total_qty']
+                    item.__dict__.update(v)
                 except Exception as e:
                     print('-----------Exception for updating JuItem:{}'.format(e))
-                    pass
                 item.save()
             return ju
         self.add_error('content', JU_FORMAT_ERROR)

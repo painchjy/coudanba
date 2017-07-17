@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block header_text %}
-{% if current_ju %}
-<a href='{% url 'order' current_ju.id%}' >
+{% if first_ju %}
+<a href='{% url 'order' first_ju.id%}' >
       看看别人在凑什么
 </a>
 {% else %}
@@ -11,6 +11,6 @@
 	<br/>
       自己凑个采购单！
 {% endblock %}
-{% block form_action %}{% url 'new_list' %}{%endblock %}
+{% block form_action %}{% url 'new_list' %}{% endblock %}
 {% block ju_table %}
 {% endblock %}

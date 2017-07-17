@@ -9,7 +9,8 @@ import re
 from json.decoder import JSONDecodeError
 
 class List(models.Model):
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='lists_owned')
+    agent = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='lists_agented')
     ju = models.ForeignKey('jus.Ju', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -32,6 +33,8 @@ class List(models.Model):
     def total_cost(self):
         if self.ju:
             return sum(i.cost for i in self.item_set.filter(name__in = self.ju.items.keys()))
+        else:
+            return sum(i.cost for i in self.item_set.all())
         return None
     @property
     def items_to_text(self):
@@ -67,8 +70,8 @@ class Item(models.Model):
     text = models.CharField(default='', max_length=140)
     list = models.ForeignKey(List, default=None)
     name = models.CharField(default='', max_length=140)
-    qty =  models.FloatField(default=0.0)
-    price =  models.FloatField(default=0.0)
+    qty =  models.FloatField(blank=True, null=True )
+    price =  models.FloatField(blank=True, null=True)
     def save(self):
         self.parse_text()
         super(Item, self).save()
@@ -108,7 +111,10 @@ class Item(models.Model):
 
     @property
     def cost(self):
-        return self.qty*self.price
+        if self.qty and self.price:
+            return self.qty*self.price
+        return 0
+
 
     class Meta:
         ordering = ('id',)

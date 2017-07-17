@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
 {% block header_text %}
   {% if list.ju %}
-    活动说明：{{ list.ju.address }}<br/>
-    截止时间：{{ list.ju.stop_date }}
+  	{% if list.agent %}
+    		代理{{ list.owner.display_name }}下单<br/>
+  	{% else %}
+    		{{ list.owner.display_name }}本人下单<br/>
+  	{% endif %}
   {% else %}
       凑着玩:{{ list.name }}
   {% endif %}
@@ -10,6 +13,38 @@
 
 {% block form_action %}{% url 'view_list' list.id %}{% endblock %}
 {% block table %}
+    {% if orders and list.ju %}
+    <table id="id_orders_table" class="table">
+        <thead class="thead-inverse">
+	<tr>
+                <th style='text-align: right'></th>
+                <th style='text-align: right'>产品代号</th>
+                {% for k,v in list.ju.sorted_items %}
+                <th style='text-align: right'>{{k}} </th>
+                {% endfor%}
+                <th></th>
+        </tr>
+        <tr>
+                <th style='text-align: center'>群组</th>
+                <th style='text-align: center'>账号名称 \ 单价</th>
+                {% for k,v in list.ju.sorted_items %}
+                <th style='text-align: right'>{{v.price|floatformat:2}} </th>
+                {% endfor%}
+                <th style='text-align: right'>金额</th>
+        </tr>
+	</thead>
+        {% for list_ in orders %}
+        <tr class="table-success">
+		<td style='text-align: center'>{{ list_.owner.depart_name }}</td>
+		<td style='text-align: center'>{{ list_.owner.display_name }}</td>
+                {% for qty in list_.qtys_by_ju %}
+                <td style='text-align: right'>{{qty|floatformat:-2}}</td>
+                {% endfor%}
+                <td style='text-align: right'>{{list_.total_cost|floatformat:2}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
 	<table id="id_list_table" class="table">
 		<tr>   
 			<th style='text-align: left;'>名称</th>
@@ -31,4 +66,5 @@
 			<th style='text-align: right;'>{{ list.total_cost|floatformat:2 }}</th>
 		</tr>
 	</table>
+    {% endif %}
 {% endblock %}
