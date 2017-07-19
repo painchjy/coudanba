@@ -17,23 +17,35 @@ class JuItemForm(forms.models.ModelForm):
 
     class Meta:
         model = Ju
-        fields = ('content',)
+        fields = ('content','stop_date_time')
         widgets = {
             'content': forms.Textarea(attrs={
                 'placeholder': '#@!@#$$%%#',
                 'class': 'form-control input-lg',
             }),
+            'stop_date_time': forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+                'input_formats':["%Y-%M-%D %H:%M%"],
+                'class': 'input-group date',
+            }),
+        }
+        labels = {
+            'content': '活动内容：',
+            'stop_date_time': '截止时间：',
         }
         error_messages = {
-            'content': {'required': EMPTY_ITEM_ERROR }
+            'content': {'required': EMPTY_ITEM_ERROR },
+            'stop_date_time':{'invalid': '日期格式:YYYY-MM-DD HH:MM'}
         }
 
     def save(self, owner=None, ju=None):
         item_text=self.cleaned_data['content']
+        stop_date_time = self.cleaned_data['stop_date_time']
         if ju:
             ju.content = item_text
+            ju.stop_date_time = stop_date_time
         else:
-            ju =Ju(content=item_text, owner=owner)    
+            ju =Ju(content=item_text, owner=owner, stop_date_time=stop_date_time)    
         if ju.parse_content():
             ju.save()
             for k, v in ju.sorted_items_:

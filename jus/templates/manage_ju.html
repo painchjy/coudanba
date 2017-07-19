@@ -2,6 +2,7 @@
 {% block header_text %}
 活动管理
 {% endblock %}
+{% block form_class %}form_group{% endblock %}
 {% block form_action %} {% url 'view_ju' current_ju.id %} {% endblock %}
 {% block extra_content %}
     <table id="id_ju_order_list" class="table">

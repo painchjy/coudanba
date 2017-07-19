@@ -23,6 +23,7 @@ def view_ju(request, ju_id):
 
     form = JuItemForm()
     form.fields['content'].initial = ju.content
+    form.fields['stop_date_time'].initial = ju.stop_date_time
 
     if request.method == 'POST':
         form = JuItemForm(data=request.POST)

@@ -54,7 +54,6 @@ class ItemForm(forms.models.ModelForm):
                 # should be moved to an help function
                 ju_item = ju.item_set.filter(key=self_name).first()
                 if ju_item:
-                    max_total_qty = ju_item.max_total_qty
                     total_qty = ju_item.total_qty()
                     if list_:
                         old_item = Item.objects.filter(list=list_, name=self_name).first()
@@ -62,8 +61,14 @@ class ItemForm(forms.models.ModelForm):
                             old_qty = old_item.qty
                         else:
                             old_qty = 0
-                    if max_total_qty !=None and self_qty + total_qty - old_qty > max_total_qty:
-                        return '凑单总量为{}份，已经达到了，请换一个品种凑单'.format(max_total_qty)
+                    if ju_item.max_total_qty !=None and self_qty + total_qty - old_qty > ju_item.max_total_qty:
+                        return '凑单总量为{}份，已经达到了，请换一个品种凑单'.format(ju_item.max_total_qty)
+                    if ju_item.max_qty !=None and self_qty > ju_item.max_qty:
+                        return '最大下单数量为{}份，请修改数量后重新提交'.format(ju_item.max_qty)
+                    if ju_item.min_qty !=None and self_qty < ju_item.min_qty:
+                        return '最小下单数量为{}份，请修改数量后重新提交'.format(ju_item.min_qty)
+                    if ju_item.unit !=None and (self_qty % ju_item.unit) != 0:
+                        return '下单数量必须为{}的倍数，请修改数量后重新提交'.format(ju_item.unit)
                 self_name = item_text.upper()
             try:
                 self_price = ju.items[self_name]['price']

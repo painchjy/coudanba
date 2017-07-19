@@ -29,7 +29,7 @@ class Ju(models.Model):
     content = models.TextField(default='')
     address = models.CharField(default='', max_length=300)
     status = models.CharField(default='', max_length=30)
-    # stop_date = models.DateTimeField(blank=True, null=True)
+    stop_date_time = models.DateTimeField(blank=True, null=True)
     stop_date = models.CharField(default='', max_length=30)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
