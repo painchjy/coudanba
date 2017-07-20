@@ -8,26 +8,29 @@
 		<th>凑单地点</th>
 		<th>截止时间</th>
 		<th>活动状态</th>
-		<th>创建日期</th>
-		<th>创建者</th>
+		<th>活动类型</th>
+		<th>管理人</th>
 		<th>操作</th>
 	</tr>
 	{% load tz %}
 	{% for ju in jus %}
 	<tr>
-		<td style='text-align: center'><a href="{{ ju.get_absolute_url}}">{{ju.address}}</a></td>
+		<td style='text-align: center'>{{ju.address}}</td>
 		<td style='text-align: center'>{{ju.stop_date}}</td>
 		<td style='text-align: right'>{{ju.status}}</td>
-		<td style='text-align: right'>{{ju.created_at|date:'Y-m-d H:i'}}</td>
+		<td style='text-align: right'>{{ju.ju_type}}</td>
 		<td style='text-align: right'>{{ju.owner.display_name}}</td>
 		<td style='text-align: center'>
-		    <a href="{% url 'order' ju.id %}">
+		    <a href="{% url 'order' ju.id %}" class="btn btn-info">
 		    {% if ju.is_active %}
 				下单
 		    {% else %}
 		    		查看
 		    {% endif %}
 		    </a>
+		    {% if ju.owner == user or not ju.owner %}
+		    	<a href="{{ ju.get_absolute_url}}" class="btn btn-info">管理</a>
+		    {% endif %}
 		</td>
 	</tr>
 	{% endfor %}

@@ -43,12 +43,13 @@ class List(models.Model):
     @property
     def qtys_by_ju(self):
         qtys=[]
-        for k,v in self.ju.sorted_items:
-            try:
-                qty = Item.objects.get(list=self, text__istartswith=k).qty
-            except:
-                qty = '' 
-            qtys.append(qty)
+        if self.ju.sorted_items:
+            for k,v in self.ju.sorted_items:
+                try:
+                    qty = Item.objects.get(list=self, text__istartswith=k).qty
+                except:
+                    qty = '' 
+                qtys.append(qty)
         return qtys
 
     def get_absolute_url(self):

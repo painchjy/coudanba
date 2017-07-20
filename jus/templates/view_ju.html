@@ -15,14 +15,14 @@
 		<th>金额</th>
 	</tr>
 	{% for list_ in current_ju.list_set.all %}
-	    {% if list_.owner.depart_name == owner.depart_name %}
+	    {% if list_.owner.depart_name == user.depart_name %}
 	<tr>
 		<td style='text-align: center'>{{list_.owner.depart_name}}</td>
 		<td style='text-align: center'>{{list_.owner.display_name}}</td>
 		{% for qty in list_.qtys_by_ju %}
 		<td style='text-align: right'>{{qty}}</td>
 		{% endfor%}
-		<td style='text-align: right'>{{list_.total_cost}}</td>
+		<td style='text-align: right'>{{list_.total_cost|floatformat:2}}</td>
 	</tr>
 	    {% endif %}
 	{% endfor %}

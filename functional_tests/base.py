@@ -9,7 +9,7 @@ from selenium.webdriver.common.keys import Keys
 from jus.models import Ju
 from accounts.models import User
 import json
-from fixtures.ju import FIXTURE_JU_CONTENT
+from fixtures.ju import FIXTURE_JU
 from .management.commands.create_session import create_pre_authenticated_session
 
 MAX_WAIT = 30
@@ -34,7 +34,9 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def load_fixture_ju(self):
         # create first ju content before test
-        ju = Ju.objects.create(content=FIXTURE_JU_CONTENT)
+        
+        ju = Ju()
+        ju.__dict__.update(FIXTURE_JU)
         ju.parse_content()
         ju.save()
         return ju

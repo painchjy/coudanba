@@ -33,7 +33,6 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('截止时间', header_text)
         active_ju = Ju.active_ju()
         self.assertIn(active_ju.address, header_text)
-        self.assertIn(active_ju.stop_date, header_text)
 
         # There are some ju items list under the header
         items = active_ju.items

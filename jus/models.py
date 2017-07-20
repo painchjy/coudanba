@@ -6,8 +6,21 @@ from django.utils import timezone
 import json
 import shlex
 import re
+from jsonfield import JSONField
 from json.decoder import JSONDecodeError
 from lists.models import Item  as ListItem
+STATUS_CHOICES = (
+    ('testing','测试'),
+    ('active','开始'),
+    ('delivering','发货中'),
+    ('paying','收款中'),
+    ('close','关闭'),
+)
+JU_TYPE_CHOICES = (
+    ('order','凑单'),
+    ('didi','拼车'),
+    ('plan','预算'),
+)
 
 class Product(models.Model):
    
@@ -21,38 +34,31 @@ class Product(models.Model):
 class Ju(models.Model):
     def __init__(self, *args, **kwargs):
         super(Ju, self).__init__(*args, **kwargs)
-        self.items_ = None
         self.sorted_items_ = None
 
     
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     content = models.TextField(default='')
+    items = JSONField()
     address = models.CharField(default='', max_length=300)
-    status = models.CharField(default='', max_length=30)
+    status = models.CharField(default='', max_length=30,choices=STATUS_CHOICES)
+    ju_type = models.CharField(default='', max_length=30,choices=JU_TYPE_CHOICES)
     stop_date_time = models.DateTimeField(blank=True, null=True)
     stop_date = models.CharField(default='', max_length=30)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def parse_content(self):
-        try:
-            j = json.loads(self.content)
-            self.address = j['address']
-            self.stop_date = j['stop_date']
-            self.status = j['status']
-            self.items_ = j['items']
-            self.sorted_items_ = sorted(self.items_.items())
-            for k, v in self.sorted_items_:
-                qty_sum = sum(
-                    i.qty for i in ListItem.objects.filter(
-                        list__ju=self, 
-                        text__istartswith=k
-                ))
-                self.items_[k].update({'qty_sum': qty_sum})
-                self.sorted_items_ = sorted(self.items_.items())
-        except (JSONDecodeError, ValueError, KeyError) as e:
-            print('------Exception:{}'.format(e))
-            return False
+        i_ = dict(self.items.items())
+        self.sorted_items_ = sorted(self.items.items())
+        for k, v in self.sorted_items_:
+            qty_sum = sum(
+                i.qty for i in ListItem.objects.filter(
+                    list__ju=self, 
+                    text__istartswith=k
+            ))
+            i_[k].update({'qty_sum': qty_sum})
+            self.sorted_items_ = sorted(i_.items())
         return True
     @property
     def name(self):
@@ -62,11 +68,6 @@ class Ju(models.Model):
         if self.status == 'active':
             return True
         return False
-    @property
-    def items(self):
-        if not self.items_:
-            self.parse_content()
-        return self.items_
 
     @property
     def sorted_items(self):

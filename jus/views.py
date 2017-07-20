@@ -5,30 +5,33 @@ from jus.forms import JuItemForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
-import csv
+import csv,json
 User = get_user_model()
 
 # list the ju's orders, all list owner's  department  
 # should be as same as the request user
 def view_ju(request, ju_id):
     ju = Ju.objects.get(id = ju_id)
-    owner = request.user
     if not request.user.is_authenticated:
         return redirect('/')
 
     if ju.owner:
         if request.user != ju.owner:
-            return render(request, 'view_ju.html', { 'current_ju': ju,  'owner': owner})
+            return render(request, 'view_ju.html', { 'current_ju': ju,  'user': request.user})
             # return view_ju(request, ju_id)
 
     form = JuItemForm()
+    form.fields['address'].initial = ju.address
     form.fields['content'].initial = ju.content
+    form.fields['items'].initial = json.dumps(ju.items,ensure_ascii=False,indent=1)
     form.fields['stop_date_time'].initial = ju.stop_date_time
+    form.fields['status'].initial = ju.status
+    form.fields['ju_type'].initial = ju.ju_type
 
     if request.method == 'POST':
         form = JuItemForm(data=request.POST)
         if form.is_valid():
-            form.save(owner=ju.owner, ju=ju)
+            form.save(owner=request.user, ju=ju)
     return render(request, 'manage_ju.html', { 'current_ju': ju,  'form': form})
 
 def new_ju(request):
@@ -54,7 +57,7 @@ def list_jus(request):
         return render(
             request,
             'list_jus.html', 
-            { 'owner': request.user, 'jus': Ju.objects.all, 'list_dict': list_dict}
+            { 'user': request.user, 'jus': Ju.objects.all, 'list_dict': list_dict}
         )
     return redirect('/')
 
