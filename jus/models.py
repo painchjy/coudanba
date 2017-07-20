@@ -51,14 +51,17 @@ class Ju(models.Model):
     def parse_content(self):
         i_ = dict(self.items.items())
         self.sorted_items_ = sorted(self.items.items())
-        for k, v in self.sorted_items_:
-            qty_sum = sum(
-                i.qty for i in ListItem.objects.filter(
-                    list__ju=self, 
-                    text__istartswith=k
-            ))
-            i_[k].update({'qty_sum': qty_sum})
-            self.sorted_items_ = sorted(i_.items())
+        try:
+            for k, v in self.sorted_items_:
+                qty_sum = sum(
+                    i.qty for i in ListItem.objects.filter(
+                        list__ju=self, 
+                        text__istartswith=k
+                ))
+                i_[k].update({'qty_sum': qty_sum})
+                self.sorted_items_ = sorted(i_.items())
+        except Exception as e:
+            return False
         return True
     @property
     def name(self):

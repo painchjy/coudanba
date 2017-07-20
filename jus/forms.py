@@ -62,22 +62,22 @@ class JuItemForm(forms.models.ModelForm):
         if owner:
             ju.owner = owner
         ju.save()
-        for k, v in ju.sorted_items:
-            item = ju.item_set.filter(key=k).first()
-            if item:
-                if item.price != float(v['price']):
-                    item.price = float(v['price'])
-                    ListItem.objects.filter(list__ju=ju, text__istartswith=k).update(price=item.price)
-            else:
-                item = Item(ju=ju, key=k)
+        try:
+            for k, v in ju.sorted_items:
+                item = ju.item_set.filter(key=k).first()
+                if item:
+                    if item.price != float(v['price']):
+                        item.price = float(v['price'])
+                        ListItem.objects.filter(list__ju=ju, text__istartswith=k).update(price=item.price)
+                else:
+                    item = Item(ju=ju, key=k)
 
-            try:
-                item.__dict__.update(v)
-            except Exception as e:
-                print('-----------Exception for updating JuItem:{}'.format(e))
-                self.add_error('items', 'Update Item Error:{}'.format(e))
-                return
-            item.save()
+                    item.__dict__.update(v)
+                item.save()
+        except Exception as e:
+            print('-----------Exception for updating JuItem:{}'.format(e))
+            self.add_error('items', 'Update Item Error:{}'.format(e))
+            return
         return ju
 
 class UsersForm(forms.models.ModelForm):

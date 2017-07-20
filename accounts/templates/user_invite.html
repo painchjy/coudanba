@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block header_text %}邀请{% endblock %}
 {% block form_action %} {% url 'user_invite' %} {% endblock %}
+{% block ju_form_inputs %}
+{% endblock %}
 {% block user_invite_form_inputs %} 
 			 {{ form.email }}
 			 <br/>

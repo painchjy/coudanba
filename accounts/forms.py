@@ -72,6 +72,8 @@ class UserInviteForm(EmailInputForm):
         email = self.cleaned_data['email']
         memo = self.cleaned_data['memo']
         group_name = self.cleaned_data['group_name']
+        if group_name == request.user.depart_name:
+            memo = memo + '作为{}的成员，{}将可以代你在凑单吧下单，如对此邮件有疑问，请联系您的邀请人。'.format(group_name,request.user.display_name)
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
