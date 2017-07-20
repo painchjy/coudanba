@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from lists.models import Item, List
 from jus.models import Ju
 from lists.forms import ItemForm, ExistingListItemForm, NewListForm
-from jus.forms import JuItemForm
+from jus.forms import UsersForm
 from accounts.forms import EmailInputForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
@@ -122,13 +122,13 @@ def load_users(request, ju_id):
         if request.user != ju.owner:
             return redirect(reverse('home'))
 
-    form = JuItemForm()
+    form = UsersForm()
     form.fields['content'].initial = '\n'.join(
         ['{};{}'.format(row.email,row.depart_name) for row in User.objects.all()]
     )
 
     if request.method == 'POST':
-        form = JuItemForm(data=request.POST)
+        form = UsersForm(data=request.POST)
         if form.is_valid():
             form.load_users()
 

@@ -22,7 +22,7 @@ def view_ju(request, ju_id):
 
     form = JuItemForm()
     form.fields['address'].initial = ju.address
-    form.fields['content'].initial = ju.content
+    # form.fields['content'].initial = ju.content
     form.fields['items'].initial = json.dumps(ju.items,ensure_ascii=False,indent=1)
     form.fields['stop_date_time'].initial = ju.stop_date_time
     form.fields['status'].initial = ju.status

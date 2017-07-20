@@ -17,14 +17,10 @@ class JuItemForm(forms.models.ModelForm):
 
     class Meta:
         model = Ju
-        fields = ('content','items','stop_date_time','status','address','ju_type')
+        fields = ('items','stop_date_time','status','address','ju_type')
         widgets = {
             'address': forms.fields.TextInput(attrs={
                 'placeholder': '可以输入活动地点和要求',
-                'class': 'form-control input-lg',
-            }),
-            'content': forms.Textarea(attrs={
-                'placeholder': '#@!@#$$%%#',
                 'class': 'form-control input-lg',
             }),
             'items': forms.Textarea(attrs={
@@ -44,7 +40,6 @@ class JuItemForm(forms.models.ModelForm):
         }
         labels = {
             'address': '活动说明：',
-            'content': '活动项目：',
             'items': '活动项目：',
             'stop_date_time': '截止时间：',
             'status': '状态：',
@@ -52,7 +47,6 @@ class JuItemForm(forms.models.ModelForm):
         }
         error_messages = {
             'address': {'required': EMPTY_ITEM_ERROR },
-            'content': {'required': EMPTY_ITEM_ERROR },
             'items': {'required': EMPTY_ITEM_ERROR , 'invalid': JU_FORMAT_ERROR},
             'stop_date_time':{'invalid': '日期格式:YYYY-MM-DD HH:MM'}
         }
@@ -61,7 +55,6 @@ class JuItemForm(forms.models.ModelForm):
         if not ju:
             ju =Ju(owner=owner)    
         ju.address = self.cleaned_data['address']
-        ju.content = self.cleaned_data['content']
         ju.items = self.cleaned_data['items']
         ju.stop_date_time = self.cleaned_data['stop_date_time']
         ju.status = self.cleaned_data['status']
@@ -87,6 +80,16 @@ class JuItemForm(forms.models.ModelForm):
             item.save()
         return ju
 
+class UsersForm(forms.models.ModelForm):
+    class Meta:
+        model = Ju
+        fields = ['content',]
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'placeholder': '#@!@#$$%%#',
+                'class': 'form-control input-lg',
+            }),
+        }
     def load_users(self):
 
         f = self.cleaned_data['content']
