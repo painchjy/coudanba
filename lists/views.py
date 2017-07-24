@@ -123,6 +123,8 @@ def home_page(request):
 def render_home_page(request, ju):
     form = NewListForm()
     form.fields['text'].widget.attrs['placeholder'] = '试试看：橙子1斤 2 2.5'
+    if request.user.is_authenticated:
+        return render(request, 'home.html', {'form': form, 'first_ju': ju})
     email_input_form = EmailInputForm()
     return render(request, 'home.html', {'form': form, 'first_ju': ju, 'email_input_form': email_input_form})
 def new_list(request):
@@ -157,6 +159,13 @@ def view_list(request, list_id):
         form = ExistingListItemForm(for_list=list_, data=request.POST)
         if form.is_valid():
             form.save()
+    if request.user.is_authenticated:
+        return render(
+            request, 
+            'list.html', 
+            { 'list': list_, 'form': form}
+        )
+
     email_input_form = EmailInputForm()
     return render(
         request, 
