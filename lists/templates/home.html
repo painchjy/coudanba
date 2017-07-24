@@ -6,7 +6,9 @@
 </a>
 {% else %}
       所有活动都凑完了
+    {% if not email_input_form %}
     <a href={% url 'new_ju' %}>发起活动</a>
+    {% endif %}
 {% endif %}
 	<br/>
 	<br/>
