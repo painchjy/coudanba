@@ -6,13 +6,16 @@
 </a>
 {% else %}
       所有活动都凑完了
+    <a href={% url 'new_ju' %}>发起活动</a>
 {% endif %}
 	<br/>
 	<br/>
       自己凑个采购单！
 {% endblock %}
 {% block form_action %}{% url 'new_list' %}{% endblock %}
-{% block ju_form_inputs %}
+{% block order_form %}
+{% endblock %}
+{% block ju_form %}
 {% endblock %}
 {% block ju_table %}
 {% endblock %}

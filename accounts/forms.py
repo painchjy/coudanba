@@ -13,7 +13,7 @@ class EmailInputForm(forms.Form):
     email = forms.EmailField(
         widget = forms.TextInput(attrs={
             'placeholder': '输入邮箱',
-            'class': 'form-control',
+            'class': 'form-control input-sm',
             }),
         error_messages = {
             'required': EMPTY_EMAIL_LIST_ERROR
@@ -54,7 +54,7 @@ class UserInviteForm(EmailInputForm):
         max_length = 20,
         widget = forms.TextInput(attrs={
             'placeholder': '输入群组名称',
-            'class': 'form-control input-lg',
+            'class': 'form-control input-sm',
             }),
         error_messages = {
             'required': EMPTY_GROUP_NAME_ERROR
@@ -65,7 +65,7 @@ class UserInviteForm(EmailInputForm):
         max_length = 2048,
         widget = forms.Textarea(attrs={
             'placeholder': '输入邀请函正文',
-            'class': 'form-control input-lg',
+            'class': 'form-control input-sm',
             }),
         )
     def invite(self,request):

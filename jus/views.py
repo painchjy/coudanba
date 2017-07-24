@@ -37,6 +37,14 @@ def view_ju(request, ju_id):
 def new_ju(request):
     owner = request.user
     form = JuItemForm()
+    form.fields['items'].initial = json.dumps(
+        {
+            "A":{"desc":"较完整的项目","price":0,"href":"http://...","max_total_qty":100,"max_qty":10},
+            "B":{"desc":"最简单的项目"},
+        },
+        ensure_ascii=False,
+        indent=1
+    )
     if request.method == 'POST':
         form = JuItemForm(data=request.POST)
         if form.is_valid():

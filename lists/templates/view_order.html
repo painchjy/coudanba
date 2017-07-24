@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block header_text %}
+	{% if list.agent and list.agent != list.owner %}
+	订单代理人：{{list.agent.display_name}}
+	{% endif %}
+{% endblock %}
+
+{% block list_form %}
+{% endblock %}
+{% block order_form_action %}{% url 'view_order' list.id %}{% endblock %}
+{% block new_agent_form_inputs %}
+{% endblock %}
+{% block ju_form %}
+{% endblock %}
+{% block table %}
+    <table id="id_orders_table" class="table">
+        <thead class="thead-inverse">
+	<tr>
+                <th style='text-align: center'>订单类型</th>
+                <th style='text-align: center'>账号名称\代号</th>
+                {% for k,v in list.ju.sorted_items %}
+                <th style='text-align: right'>{{k}} </th>
+                {% endfor%}
+		<th style='text-align: right'>
+		    <a href="{% url 'new_order' current_ju.id %}" class="btn btn-info">新建订单</a>
+		</th>
+        </tr>
+	</thead>
+        <tr class="table-success">
+		<th style='text-align: center'>
+		    {% if not list.agent or list.agent == list.owner %}
+		    	本人
+                    {% else %}
+		        代理	
+                    {% endif %}
+		</th>
+		<th style='text-align: center'>{{ list.owner.display_name }}</th>
+                {% for qty in list.qtys_by_ju %}
+                <th style='text-align: right'>{{qty|floatformat:-2}}</th>
+                {% endfor%}
+                <th style='text-align: right'>{{list.total_cost|floatformat:2}}</th>
+        </tr>
+        {% for list_ in orders %}
+	{% if list_ != list %}
+        <tr class="table-success">
+		<td style='text-align: center'>
+		    <a href="{% url 'view_list' list_.id %}">
+		    {% if not list_.agent or list_.agent == list_.owner %}
+		    	本人
+                    {% else %}
+		        代理	
+                    {% endif %}
+		    </a>
+		</td>
+		<td style='text-align: center'>{{ list_.owner.display_name }}</td>
+                {% for qty in list_.qtys_by_ju %}
+                <td style='text-align: right'>{{qty|floatformat:-2}}</td>
+                {% endfor%}
+                <td style='text-align: right'>{{list_.total_cost|floatformat:2}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+{% endblock %}

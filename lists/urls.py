@@ -20,6 +20,8 @@ from lists import views
 urlpatterns = [
     url(r'^new$',views.new_list, name='new_list' ),
     url(r'^(\d+)/$',views.view_list, name='view_list' ),
+    url(r'^view_order/(\d+)/$',views.view_order, name='view_order' ),
+    url(r'^new_order/(\d+)/$',views.new_order, name='new_order' ),
     url(r'^users/(.+)/$',views.my_lists, name='my_lists' ),
     url(r'^loadusers/(\d+)/$',views.load_users, name='load_users' ),
     url(r'^order/(\d+)/$',views.order, name='order' ),

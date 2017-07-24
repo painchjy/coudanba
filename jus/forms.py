@@ -61,19 +61,9 @@ class JuItemForm(forms.models.ModelForm):
         ju.ju_type = self.cleaned_data['ju_type']
         if owner:
             ju.owner = owner
-        ju.save()
         try:
-            for k, v in ju.sorted_items:
-                item = ju.item_set.filter(key=k).first()
-                if item:
-                    if item.price != float(v['price']):
-                        item.price = float(v['price'])
-                        ListItem.objects.filter(list__ju=ju, text__istartswith=k).update(price=item.price)
-                else:
-                    item = Item(ju=ju, key=k)
-
-                    item.__dict__.update(v)
-                item.save()
+            ju.save()
+            ju.db_triggers()
         except Exception as e:
             print('-----------Exception for updating JuItem:{}'.format(e))
             self.add_error('items', 'Update Item Error:{}'.format(e))

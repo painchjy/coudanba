@@ -56,15 +56,18 @@
 	    <div class="row">
 		<div class="col-md-6 col-md-offset-3 jumbotron">
 		    <div class="text-center">
-		        <h3>{% block header_text %}{% endblock %}</h3>
 {% block ju_table %}
   {% if current_ju %}
-    <h4>
-    发起人：{{ current_ju.owner.display_name }}<br/>
+    <h3>
+    活动发起人：{{ current_ju.owner.display_name }}<br/>
     活动说明：{{ current_ju.address }}<br/>
     截止时间：{{ current_ju.stop_date_time|date:'Y-m-d H:i' }}
-    </h4>
-    <h4><a href={% url 'next_ju' current_ju.id %}>下一个活动</a></h4>
+    </h3>
+    <h3><a href={% url 'next_ju' current_ju.id %}>换一个活动</a> &nbsp
+    {% if not email_input_form %}
+    <a href={% url 'new_ju' %}>发起活动</a>
+    {% endif %}
+    </h3>
     <table id="id_ju_table" class="table">
         <tr>
 		<th style='text-align: center;'>代号</th>
@@ -91,6 +94,7 @@
     </table>
   {% endif %}
 {% endblock %}
+		        <h4>{% block header_text %}{% endblock %}</h4>
 {% block list_form %}
 <form method="POST" action="{% block form_action %}{% endblock %}">
   <div class="form-inline"
@@ -99,43 +103,83 @@
     <input type="submit" class="btn btn-primary mx-sm-2" value="提交"  style="vertical-align:-8px;" />
     </div>
   </div>
-{% block ju_form_inputs %}
-<div class="form-group">
-  <label for="{{form.address.id_for_label}}">{{form.address.label}}</label>
-  {{ form.address }}
-</div>
-<div class="form-group">
-  <label for="{{form.ju_type.id_for_label}}">{{form.ju_type.label}}</label>
-  {{ form.ju_type }}
-</div>
-<div class="form-inline">
-  <label for="{{form.stop_date_time.id_for_label}}">{{form.stop_date_time.label}}</label>
-  {{ form.stop_date_time }}
-  <label for="{{form.status.id_for_label}}">{{form.status.label}}</label>
-  {{ form.status }}
-</div>
-<div class="form-group">
-  <label for="{{form.items.id_for_label}}">{{form.items.label}}</label>
-  {{ form.items }}
-</div>
-<input type="submit" class="btn btn-primary mx-sm-2" value="提交"   />
+   {% csrf_token %}
+    {% if form.errors %}
+      <div class="form-group has-error">
+  	<span class="help-block">
+	{{ form.text.errors }}
+	</span>
+      </div>
+    {% endif %}
+</form>
 {% endblock %}
-{% block load_users_form_inputs %}
+{% block order_form %}
+<form method="POST" action="{% block order_form_action %}{% endblock %}">
+  {% block new_agent_form_inputs %}
+  <div class="form-inline">
+    <div class="form-group">
+      <label for="{{form_list.owner.id_for_label}}">{{form_list.owner.label}}</label>
+      {{ form_list.owner }}
+    </div>
+  </div>
+  {% endblock %}
+  <div class="form-inline">
+    <div class="form_group">
+    {{ form.text }}
+    <input type="submit" class="btn btn-primary mx-sm-2" value="提交"  style="vertical-align:-8px;" />
+    </div>
+  </div>
+   {% csrf_token %}
+    {% if form.errors %}
+      <div class="form-group has-error">
+  	<span class="help-block">
+	{{ form.text.errors }}
+	{{ form_list.owner.errors }}
+	</span>
+      </div>
+    {% endif %}
+</form>
 {% endblock %}
-{% block user_invite_form_inputs %}
-{% endblock %}
-{% csrf_token %}
-			  {% if form.errors %}
-			      <div class="form-group has-error">
-			  	<span class="help-block">
-					{{ form.text.errors }}
-					{{ form.address.errors }}
-					{{ form.items.errors }}
-					{{ form.stop_date_time.errors }}
-				</span>
-			      </div>
-			  {% endif%}
-		          </form>
+{% block ju_form %}
+<form method="POST" action="{% block ju_form_action %}{% endblock %}">
+    {% block ju_form_inputs %}
+    <input type="submit" class="btn btn-primary mx-sm-2" value="提交"   />
+    <div class="form-group">
+      <label for="{{form.address.id_for_label}}">{{form.address.label}}</label>
+      {{ form.address }}
+    </div>
+    <div class="form-group">
+      <label for="{{form.ju_type.id_for_label}}">{{form.ju_type.label}}</label>
+      {{ form.ju_type }}
+    </div>
+    <div class="form-inline">
+      <label for="{{form.stop_date_time.id_for_label}}">{{form.stop_date_time.label}}</label>
+      {{ form.stop_date_time }}
+      <label for="{{form.status.id_for_label}}">{{form.status.label}}</label>
+      {{ form.status }}
+    </div>
+    <div class="form-group">
+      <label for="{{form.items.id_for_label}}">{{form.items.label}}</label>
+      {{ form.items }}
+    </div>
+    {% endblock %}
+    {% block load_users_form_inputs %}
+    {% endblock %}
+    {% block user_invite_form_inputs %}
+    {% endblock %}
+    {% csrf_token %}
+    <input type="submit" class="btn btn-primary mx-sm-2" value="提交"   />
+    {% if form.errors %}
+      <div class="form-group has-error">
+  	<span class="help-block">
+	{{ form.text.errors }}
+	{{ form.address.errors }}
+	{{ form.items.errors }}
+	{{ form.stop_date_time.errors }}
+	</span>
+      </div>
+    {% endif %}
+</form>
 {% endblock %}
 		    </div>
 		</div>

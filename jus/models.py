@@ -48,7 +48,32 @@ class Ju(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def parse_content(self):
+    def db_triggers(self):
+        for k, v in self.sorted_items:
+            item = self.item_set.filter(key=k).first()
+            if item:
+                if item.price != v['price']:
+                    item.price = v['price']
+                    ListItem.objects.filter(list__ju=self, text__istartswith=k).update(price=item.price)
+            else:
+                item = Item(ju=self, key=k)
+
+            item.__dict__.update(v)
+            item.save()
+
+    @property
+    def name(self):
+        return '{}:{}'.format(self.address, self.stop_date)
+    @property
+    def is_active(self):
+        if self.status == 'active':
+            return True
+        return False
+
+    @property
+    def sorted_items(self):
+        if self.sorted_items_:
+            return self.sorted_items_
         i_ = dict(self.items.items())
         self.sorted_items_ = sorted(self.items.items())
         try:
@@ -61,21 +86,7 @@ class Ju(models.Model):
                 i_[k].update({'qty_sum': qty_sum})
                 self.sorted_items_ = sorted(i_.items())
         except Exception as e:
-            return False
-        return True
-    @property
-    def name(self):
-        return '{}:{}'.format(self.address, self.stop_date)
-    @property
-    def is_active(self):
-        if self.status == 'active':
-            return True
-        return False
-
-    @property
-    def sorted_items(self):
-        if not self.sorted_items_:
-            self.parse_content()
+            return  []
         return self.sorted_items_
 
     @classmethod
@@ -85,6 +96,13 @@ class Ju(models.Model):
     def get_absolute_url(self):
         return reverse('view_ju', args=[self.id])
 
+    def can_order(self, user):
+        if self.status == 'active':
+            return True
+        if self.status == 'testing' and user == self.owner:
+            return True
+        return False
+
     class Meta:
         ordering = ('-updated_at', )
 
@@ -93,14 +111,14 @@ class Item(models.Model):
     key = models.CharField(default='', max_length=30)
     ju = models.ForeignKey(Ju, blank=True, null=True)
     product = models.ForeignKey(Product, blank=True, null=True)
-    price = models.FloatField(default=0.0)
+    price = models.DecimalField(default=0.0, max_digits=15, decimal_places=2)
     desc = models.TextField(default='')
     href = models.TextField(default='')
-    unit = models.FloatField(blank=True, null=True )
-    min_qty = models.FloatField(blank=True, null=True )
-    max_qty = models.FloatField(blank=True, null=True )
-    min_total_qty = models.FloatField(blank=True, null=True )
-    max_total_qty = models.FloatField(blank=True, null=True )
+    unit = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
+    min_qty = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2 )
+    max_qty = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2 )
+    min_total_qty = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=2 )
+    max_total_qty = models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=2 )
     updated_at = models.DateTimeField(auto_now=True)
 
     def total_qty(self):

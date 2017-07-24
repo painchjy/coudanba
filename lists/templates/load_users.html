@@ -2,8 +2,12 @@
 {% block header_text %}邮箱授权{% endblock %}
 {% block ju_table %}
 {% endblock %}
+{% block list_form %}
+{% endblock %}
+{% block order_form %}
+{% endblock %}
 
-{% block form_action %} {% url 'load_users' current_ju.id %} {% endblock %}
+{% block ju_form_action %} {% url 'load_users' current_ju.id %} {% endblock %}
 {% block ju_form_inputs %}
 {% endblock %}
 {% block load_users_form_inputs %}

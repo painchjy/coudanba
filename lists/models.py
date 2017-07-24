@@ -7,6 +7,7 @@ import json
 import shlex
 import re
 from json.decoder import JSONDecodeError
+from decimal import Decimal
 
 class List(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='lists_owned')
@@ -56,8 +57,8 @@ class List(models.Model):
         return reverse('view_list', args=[self.id])
 
     @staticmethod
-    def create_new(first_item_text, owner=None, ju=None):
-        list_ = List(owner=owner, ju=ju)
+    def create_new(first_item_text, owner=None, agent=None, ju=None):
+        list_ = List(owner=owner, agent=agent, ju=ju)
         list_.full_clean()
         list_.save()
         item = Item(text=first_item_text, list=list_)
@@ -71,8 +72,8 @@ class Item(models.Model):
     text = models.CharField(default='', max_length=140)
     list = models.ForeignKey(List, default=None)
     name = models.CharField(default='', max_length=140)
-    qty =  models.FloatField(blank=True, null=True )
-    price =  models.FloatField(blank=True, null=True)
+    qty =  models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
+    price =  models.DecimalField(blank=True, null=True, max_digits=15, decimal_places=2)
     def save(self):
         self.parse_text()
         super(Item, self).save()
@@ -84,10 +85,11 @@ class Item(models.Model):
         prior_n = None
         try:
             if last_index >= 1:
-                last_n = float(units[last_index])
+                last_n = Decimal(units[last_index])
             if last_index >= 2:
-                prior_n = float(units[last_index - 1])
-        except (ValueError,IndexError) as e:
+                prior_n = Decimal(units[last_index - 1])
+        except Exception as e:
+            print('----units:{},exception:{}'.format(units,e))
             pass
         if self.list.ju:
             if last_n != None:

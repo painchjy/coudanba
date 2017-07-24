@@ -13,7 +13,7 @@ class NewVisitorTest(FunctionalTest):
         # She notices the page title and header mention 凑单吧
         self.assertIn('凑单吧',self.browser.title)
         
-        header_text = self.browser.find_element_by_tag_name('h3').text  
+        header_text = self.browser.find_element_by_tag_name('h4').text  
         self.assertIn('自己凑', header_text)
 
         
@@ -26,7 +26,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('凑单吧',self.browser.title)
         self.browser.find_element_by_link_text('看看别人在凑什么').click()
         time.sleep(2)
-        header_text = self.browser.find_element_by_tag_name('h4').text  
+        header_text = self.browser.find_element_by_tag_name('h3').text  
         self.assertIn('活动说明', header_text)
         
 

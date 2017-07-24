@@ -37,8 +37,8 @@ class FunctionalTest(StaticLiveServerTestCase):
         
         ju = Ju()
         ju.__dict__.update(FIXTURE_JU)
-        ju.parse_content()
         ju.save()
+        ju.db_triggers()
         return ju
 
     def load_fixture_user(self, email):
