@@ -87,7 +87,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         )
 
     @wait
-    def wait_for_row_in_orders_table(self, values, ju, email, depart_name):
+    def wait_for_row_in_orders_table(self, values, ju, email, depart_name=None, agented=None):
         table = self.browser.find_element_by_id('id_orders_table')
         rows = table.find_elements_by_tag_name('tr')
         v = dict([(i,'') for i in ju.items.keys()])
@@ -96,8 +96,12 @@ class FunctionalTest(StaticLiveServerTestCase):
             sum([float(values[k])*ju.items[k]['price'] for k in values.keys()])
         )
         f_text = '} {'.join(sorted(ju.items.keys()))
-        row_text = ('{depart_name} {owner} {'+f_text+'} {total_cost}').format(
-            depart_name=depart_name,
+        if agented:
+            agent_type_text = agented
+        else:
+            agent_type_text = '本人'
+        row_text = ('{agent_type_text} {owner} {'+f_text+'} {total_cost}').format(
+            agent_type_text=agent_type_text,
             owner=email.split('@')[0],
             total_cost=total_cost, 
             **v
@@ -105,7 +109,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.assertIn(' '.join(row_text.split()), [row.text for row in rows])
 
     @wait
-    def wait_for_row_not_in_orders_table(self, values, ju, email, depart_name):
+    def wait_for_row_not_in_orders_table(self, values, ju, email, depart_name=None, agented=None):
         table = self.browser.find_element_by_id('id_orders_table')
         rows = table.find_elements_by_tag_name('tr')
         v = dict([(i,'') for i in ju.items.keys()])
@@ -114,8 +118,12 @@ class FunctionalTest(StaticLiveServerTestCase):
             sum([float(values[k])*ju.items[k]['price'] for k in values.keys()])
         )
         f_text = '} {'.join(sorted(ju.items.keys()))
-        row_text = ('{depart_name} {owner} {'+f_text+'} {total_cost}').format(
-            depart_name=depart_name,
+        if agented:
+            agent_type_text = agented
+        else:
+            agent_type_text = '本人'
+        row_text = ('{agent_type_text} {owner} {'+f_text+'} {total_cost}').format(
+            agent_type_text=agent_type_text,
             owner=email.split('@')[0],
             total_cost=total_cost, 
             **v

@@ -183,7 +183,7 @@ def load_users(request, ju_id):
 
     form = UsersForm()
     form.fields['content'].initial = '\n'.join(
-        ['{};{}'.format(row.email,row.depart_name) for row in User.objects.all()]
+        ['{};{};{}'.format(row.email,row.depart_name,row.display_name) for row in User.objects.all()]
     )
 
     if request.method == 'POST':

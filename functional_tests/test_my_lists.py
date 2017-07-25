@@ -78,6 +78,7 @@ class MyListsTest(FunctionalTest):
         self.add_list_item('Immanentize eschaton')
         first_list_url = self.browser.current_url
 
+        time.sleep(2)
     
         self.browser.find_element_by_link_text('注销').click()
         self.wait_to_be_logged_out(email)
@@ -86,6 +87,7 @@ class MyListsTest(FunctionalTest):
         self.assertNotEqual(self.browser.current_url, first_list_url)
         self.assertEqual(self.browser.current_url, self.live_server_url + '/')
 
+        time.sleep(2)
         email = 'blink@example.com'
         self.load_fixture_user(email=email)
         self.create_pre_authenticated_session(email)

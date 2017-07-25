@@ -85,8 +85,12 @@ class UsersForm(forms.models.ModelForm):
         f = self.cleaned_data['content']
         for line in f.splitlines():
             row = line.split(';')
+            if len(row) == 3:
+                display_name = row[2]
+            else:
+                display_name = row[0].split('@')[0]
             user, created = User.objects.update_or_create(
                 email=row[0],
-                defaults={'depart_name': row[1]},
+                defaults={'depart_name': row[1], 'display_name': display_name},
             )
 
