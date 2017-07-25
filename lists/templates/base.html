@@ -86,6 +86,11 @@
 			{% else %}
 				{{ v.desc }}
 			{% endif %}
+	{% if v.images %}
+	{% for img in v.images %}
+			<img src="{{img}}" style="height:50px;">
+    	{% endfor %}
+    	{% endif %}
 		</td>
 		<td style='text-align: right;'>{{ v.price|floatformat:2 }} </td>
 		<td style='text-align: right;'>{{ v.qty_sum|floatformat:2 }} </td>
