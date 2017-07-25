@@ -62,9 +62,10 @@ class MyListsTest(FunctionalTest):
 
 
         
-    def test_users_cannot_open_other_users_list_by_url(self):
+    def test_users_cannot_open_other_users_order_by_url(self):
         email = 'edith@example.com'
         self.load_fixture_user(email=email)
+        ju = self.load_fixture_ju()
         self.browser.get(self.live_server_url)
         self.wait_to_be_logged_out(email)
 
@@ -74,8 +75,8 @@ class MyListsTest(FunctionalTest):
         # She goes to the home page and starts a list
         self.browser.get(self.live_server_url)
         self.wait_to_be_logged_in(email)
-        self.add_list_item('Reticulate splines')
-        self.add_list_item('Immanentize eschaton')
+        self.add_order_item('A', 1, ju, email)
+        # self.add_order_item('B', 1, ju, email)
         first_list_url = self.browser.current_url
 
         time.sleep(2)

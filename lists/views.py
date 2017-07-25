@@ -28,7 +28,8 @@ def view_order(request, list_id):
     if request.method == 'POST':
         form = ExistingListItemForm(for_list=list_, data=request.POST)
         if form.is_valid():
-            form.save()
+            if form.save():
+                return redirect(list_)
     return render(
         request, 
         'view_order.html', 
@@ -158,7 +159,8 @@ def view_list(request, list_id):
     if request.method == 'POST':
         form = ExistingListItemForm(for_list=list_, data=request.POST)
         if form.is_valid():
-            form.save()
+            if form.save():
+                return redirect(list_)
     if request.user.is_authenticated:
         return render(
             request, 

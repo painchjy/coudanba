@@ -168,13 +168,11 @@ class FunctionalTest(StaticLiveServerTestCase):
             '{}: {}'.format(item_number, item_text)
         )
 
-    def add_list_item_for_orders(self, item_text):
-        num_rows = len(self.browser.find_elements_by_css_selector('#id_list_table tr'))
-        self.get_item_input_box().send_keys(item_text)
+    def add_order_item(self, item_key, qty, ju, email, depart_name=None, agented=None):
+        self.get_item_input_box().send_keys(item_key + ' ' + str(qty))
         self.get_item_input_box().send_keys(Keys.ENTER)
-        item_number = num_rows + 1
-        self.wait_for_row_in_list_table(
-            '{}: {}'.format(item_number, item_text)
+        self.wait_for_row_in_orders_table(
+            {item_key: qty}, ju, email, depart_name, agented
         )
     def create_pre_authenticated_session(self, email):
         if self.staging_server:
