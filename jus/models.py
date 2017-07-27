@@ -12,6 +12,7 @@ from lists.models import Item  as ListItem
 STATUS_CHOICES = (
     ('testing','测试'),
     ('active','开始'),
+    ('ordering','待发货'),
     ('delivering','发货中'),
     ('paying','收款中'),
     ('close','关闭'),
@@ -69,6 +70,9 @@ class Ju(models.Model):
         if self.status == 'active':
             return True
         return False
+    def status_name(self):
+        d = dict(STATUS_CHOICES)
+        return d[self.status]
 
     @property
     def sorted_items(self):
@@ -91,7 +95,7 @@ class Ju(models.Model):
 
     @classmethod
     def active_ju(cls):
-        return cls.objects.filter(status='active').first()
+        return cls.objects.exclude(status__in=['testing','close']).first()
 
     def get_absolute_url(self):
         return reverse('view_ju', args=[self.id])

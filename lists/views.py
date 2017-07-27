@@ -141,7 +141,7 @@ def new_list(request):
 def next_ju(request, ju_id):
     if ju_id:
         current_ju = Ju.objects.filter(id=ju_id).first()
-        next_ = Ju.objects.filter(status='active', updated_at__lt=current_ju.updated_at).exclude(id=current_ju.id).first()
+        next_ = Ju.objects.exclude(status__in=['testing','close']).filter(updated_at__lt=current_ju.updated_at).exclude(id=current_ju.id).first()
         if next_:
             return order(request, next_.id)
     return render_home_page(request, Ju.active_ju())

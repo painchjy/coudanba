@@ -61,7 +61,8 @@
     <h3>
     活动发起人：{{ current_ju.owner.display_name }}<br/>
     活动说明：{{ current_ju.address }}<br/>
-    截止时间：{{ current_ju.stop_date_time|date:'Y-m-d H:i' }}
+    截止时间：{{ current_ju.stop_date_time|date:'Y-m-d H:i' }}<br/>
+    活动状态：{{ current_ju.status_name }}    
     </h3>
     <h3><a href={% url 'next_ju' current_ju.id %}>换一个活动</a> &nbsp
     {% if not email_input_form %}
