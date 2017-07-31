@@ -1,8 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'ju_base.html' %}
 {% block header_text %}所有凑单活动{% endblock %}
-{% block list_form %}
-{% endblock %}
-{% block order_form %}
+{% block location_form %}
 {% endblock %}
 {% block ju_form %}
 {% endblock %}
@@ -10,7 +8,8 @@
 <h3>当前凑单活动</h3>
     <table id="id_jus_list" class="table">
 	<tr>
-		<th>凑单地点</th>
+		<th>活动说明</th>
+		<th>活动地点</th>
 		<th>截止时间</th>
 		<th>活动状态</th>
 		<th>活动类型</th>
@@ -18,24 +17,20 @@
 		<th>操作</th>
 	</tr>
 	{% load tz %}
-	{% for ju in jus %}
-		{% if ju.status == 'active' %}
+	{% for ju in request.user.active_jus %}
 	<tr>
 		<td style='text-align: center'>{{ju.address}}</td>
+		<td style='text-align: center'>{{ju.location.name}}</td>
 		<td style='text-align: center'>{{ju.stop_date_time|date:'Y-m-d H:i'}}</td>
-		<td style='text-align: right'>{{ju.status}}</td>
-		<td style='text-align: right'>{{ju.ju_type}}</td>
+		<td style='text-align: right'>{{ju.status_name}}</td>
+		<td style='text-align: right'>{{ju.ju_type_name}}</td>
 		<td style='text-align: right'>{{ju.owner.display_name}}</td>
 		<td style='text-align: center'>
 		    <a href="{% url 'order' ju.id %}" class="btn btn-info">
 				下单
 		    </a>
-		    {% if ju.owner == user or not ju.owner %}
-		    	<a href="{{ ju.get_absolute_url}}" class="btn btn-info">管理</a>
-		    {% endif %}
 		</td>
 	</tr>
-		{% endif %}
 	{% endfor %}
 	<tr>
 		<td style='text-align: center'>购物清单</td>
@@ -46,42 +41,11 @@
 		<td style='text-align: center'><a href="{% url 'order' 9999999 %}">凑着玩</a></td>
 	</tr>
     </table>
- <h3>我创建的凑单活动</h3>
-    <table id="id_jus_list" class="table">
-	<tr>
-		<th>凑单地点</th>
-		<th>截止时间</th>
-		<th>活动状态</th>
-		<th>活动类型</th>
-		<th>管理人</th>
-		<th>操作</th>
-	</tr>
-	{% load tz %}
-	{% for ju in jus %}
-		{% if user == ju.owner %}
-	<tr>
-		<td style='text-align: center'>{{ju.address}}</td>
-		<td style='text-align: center'>{{ju.stop_date_time|date:'Y-m-d H:i'}}</td>
-		<td style='text-align: right'>{{ju.status}}</td>
-		<td style='text-align: right'>{{ju.ju_type}}</td>
-		<td style='text-align: right'>{{ju.owner.display_name}}</td>
-		<td style='text-align: center'>
-		    <a href="{% url 'order' ju.id %}" class="btn btn-info">
-		    		查看/下单
-		    </a>
-		    {% if ju.owner == user or not ju.owner %}
-		    	<a href="{{ ju.get_absolute_url}}" class="btn btn-info">管理</a>
-		    {% endif %}
-		</td>
-	</tr>
-		{% endif %}
-	{% endfor %}
-    </table>
-   
 <h3>历史凑单活动</h3>
     <table id="id_jus_list" class="table">
 	<tr>
-		<th>凑单地点</th>
+		<th>活动说明</th>
+		<th>活动地点</th>
 		<th>截止时间</th>
 		<th>活动状态</th>
 		<th>活动类型</th>
@@ -89,24 +53,47 @@
 		<th>操作</th>
 	</tr>
 	{% load tz %}
-	{% for ju in jus %}
-		{% if ju.status != 'active'  and ju.status != 'testing' %}
+	{% for ju in request.user.closed_jus %}
 	<tr>
 		<td style='text-align: center'>{{ju.address}}</td>
+		<td style='text-align: center'>{{ju.location.name}}</td>
 		<td style='text-align: center'>{{ju.stop_date_time|date:'Y-m-d H:i'}}</td>
-		<td style='text-align: right'>{{ju.status}}</td>
-		<td style='text-align: right'>{{ju.ju_type}}</td>
+		<td style='text-align: right'>{{ju.status_name}}</td>
+		<td style='text-align: right'>{{ju.ju_type_name}}</td>
 		<td style='text-align: right'>{{ju.owner.display_name}}</td>
 		<td style='text-align: center'>
 		    <a href="{% url 'order' ju.id %}" class="btn btn-info">
 		    		查看
 		    </a>
-		    {% if ju.owner == user or not ju.owner %}
-		    	<a href="{{ ju.get_absolute_url}}" class="btn btn-info">管理</a>
-		    {% endif %}
 		</td>
 	</tr>
-		{% endif %}
+	{% endfor %}
+    </table>
+ <h3>我创建的凑单活动</h3>
+    <table id="id_jus_list" class="table">
+	<tr>
+		<th>活动说明</th>
+		<th>活动地点</th>
+		<th>截止时间</th>
+		<th>活动状态</th>
+		<th>活动类型</th>
+		<th>管理人</th>
+		<th>操作</th>
+	</tr>
+	{% load tz %}
+	{% for ju in request.user.ju_set.all %}
+	<tr>
+		<td style='text-align: center'>{{ju.address}}</td>
+		<td style='text-align: center'>{{ju.location.name}}</td>
+		<td style='text-align: center'>{{ju.stop_date_time|date:'Y-m-d H:i'}}</td>
+		<td style='text-align: right'>{{ju.status_name}}</td>
+		<td style='text-align: right'>{{ju.ju_type_name}}</td>
+		<td style='text-align: right'>{{ju.owner.display_name}}</td>
+		<td style='text-align: center'>
+		    <a href="{{ ju.get_absolute_url}}" class="btn btn-info">管理</a>
+		</td>
+	</tr>
 	{% endfor %}
     </table>
 {% endblock %}
+

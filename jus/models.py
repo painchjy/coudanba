@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.conf import settings
 from django.core.urlresolvers import reverse
 # from datetime import timedelta
@@ -21,7 +22,17 @@ JU_TYPE_CHOICES = (
     ('order','凑单'),
     ('didi','拼车'),
     ('plan','预算'),
+    ('vote','投票'),
 )
+
+class Location(models.Model):
+    name = models.CharField(default='', max_length=300)
+    def get_absolute_url(self):
+        return reverse('view_location', args=[self.id])
+
+class LocationDepart(models.Model):
+    location = models.ForeignKey(Location, blank=True, null=True)
+    depart_name = models.CharField(default='', max_length=300)
 
 class Product(models.Model):
    
@@ -39,6 +50,7 @@ class Ju(models.Model):
 
     
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    location = models.ForeignKey(Location, blank=True, null=True)
     content = models.TextField(default='')
     items = JSONField()
     address = models.CharField(default='', max_length=300)
@@ -53,8 +65,9 @@ class Ju(models.Model):
         for k, v in self.sorted_items:
             item = self.item_set.filter(key=k).first()
             if item:
-                if item.price != v['price']:
-                    item.price = v['price']
+                price  = v.get('price',0)
+                if item.price != price:
+                    item.price = price
                     ListItem.objects.filter(list__ju=self, text__istartswith=k).update(price=item.price)
             else:
                 item = Item(ju=self, key=k)
@@ -72,7 +85,10 @@ class Ju(models.Model):
         return False
     def status_name(self):
         d = dict(STATUS_CHOICES)
-        return d[self.status]
+        return d.get(self.status,'')
+    def ju_type_name(self):
+        d = dict(JU_TYPE_CHOICES)
+        return d.get(self.ju_type,'')
 
     @property
     def sorted_items(self):
@@ -94,8 +110,46 @@ class Ju(models.Model):
         return self.sorted_items_
 
     @classmethod
-    def active_ju(cls):
-        return cls.objects.exclude(status__in=['testing','close']).first()
+    def active_ju(cls, ju_type=None, locations=[]):
+        if ju_type:
+            return cls.objects.filter(
+                    ~Q(status__in=['testing','close']),
+                    Q(location__isnull=True)|Q(location__in=locations),
+                    Q(ju_type=ju_type),
+            ).first()
+        return cls.objects.filter(
+                ~Q(status__in=['testing','close']),
+                Q(location__isnull=True)|Q(location__in=locations),
+        ).first()
+    
+    @classmethod
+    def active_jus(cls, ju_type=None, locations=[]):
+        if ju_type:
+            return cls.objects.filter(
+                    ~Q(status__in=['testing','close']),
+                    Q(location__isnull=True)|Q(location__in=locations),
+                    Q(ju_type=ju_type),
+            )
+        return cls.objects.filter(
+                ~Q(status__in=['testing','close']),
+                Q(location__isnull=True)|Q(location__in=locations),
+        )
+
+    def next(self, ju_type=None,locations=[]):
+        if ju_type:
+            return Ju.objects.filter(
+                ~Q(status__in=['testing','close']),
+                ~Q(id=self.id),
+                Q(location__isnull=True)|Q(location__in=locations),
+                Q(updated_at__lt=self.updated_at),
+                Q(ju_type=ju_type),
+            ).first()
+        return Ju.objects.filter(
+            ~Q(status__in=['testing','close']),
+            ~Q(id=self.id),
+            Q(location__isnull=True)|Q(location__in=locations),
+            Q(updated_at__lt=self.updated_at),
+        ).first()
 
     def get_absolute_url(self):
         return reverse('view_ju', args=[self.id])

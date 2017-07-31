@@ -1,5 +1,6 @@
 from django.contrib import auth
 from django.db import models
+from jus.models import Ju,Location, LocationDepart
 import uuid
 
 auth.signals.user_logged_in.disconnect(auth.models.update_last_login)
@@ -12,6 +13,38 @@ class User(models.Model):
     USERNAME_FIELD = 'email'
     is_anonymous = False
     is_authenticated = True
+
+    def permitted_locations(self):
+        return Location.objects.filter(
+            id__in=LocationDepart.objects.filter(
+                depart_name=self.depart_name
+            ).values_list('location')
+        )
+    def closed_jus(self, ju_type=None):
+        if ju_type:
+            return Ju.objects.filter(
+                id__in=self.lists_owned.all().values_list('ju'),
+                ju_type=ju_type,
+                status='close'
+            )
+        return Ju.objects.filter(
+            id__in=self.lists_owned.all().values_list('ju'),
+            status='close'
+        )
+    def active_jus(self, ju_type=None):
+        if ju_type:
+            return Ju.active_jus(ju_type=ju_type, locations=self.permitted_locations())
+        return Ju.active_jus(locations=self.permitted_locations())
+
+    def active_ju(self, ju_type=None):
+        if ju_type:
+            return Ju.active_ju(ju_type=ju_type, locations=self.permitted_locations())
+        return Ju.active_ju(locations=self.permitted_locations())
+
+    def next_ju(self,ju, ju_type=None):
+        if ju_type:
+            return ju.next(ju_type=ju_type, locations=self.permitted_locations())
+        return ju.next(locations=self.permitted_locations())
 
 class Token(models.Model):
     email = models.EmailField()

@@ -1,21 +1,19 @@
-{% extends 'base.html' %}
+{% extends 'ju_base.html' %}
 {% block header_text %}
 活动管理
 {% endblock %}
-{% block list_form %}
-{% endblock %}
-{% block order_form %}
+{% block location_form %}
 {% endblock %}
 {% block ju_form_action %} {% url 'view_ju' current_ju.id %} {% endblock %}
 {% block extra_content %}
     <table id="id_ju_order_list" class="table">
 	<tr>
-		<th>群组名称</th>
-		<th>账号</th>
+		<th style='text-align: center'>群组名称</th>
+		<th style='text-align: center'>账号</th>
 		{% for k,v in current_ju.sorted_items %}
-		<th>{{k}}:{{v.desc|slice:"0:8"}} </th>
+		<th style='text-align: right'>{{k}}:{{v.desc|slice:"0:8"}} </th>
 		{% endfor%}
-		<th>金额</th>
+		<th style='text-align: right'>金额</th>
 	</tr>
 	{% for list_ in current_ju.list_set.all %}
 	<tr>

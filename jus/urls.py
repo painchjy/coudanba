@@ -21,4 +21,6 @@ urlpatterns = [
     url(r'^$',views.list_jus, name='list_jus' ),
     url(r'^(\d+)/$',views.view_ju, name='view_ju' ),
     url(r'^new/$',views.new_ju, name='new_ju' ),
+    url(r'^location/$',views.new_location, name='new_location' ),
+    url(r'^location/(\d+)/$',views.view_location, name='view_location' ),
 ]

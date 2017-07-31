@@ -139,12 +139,19 @@ def new_list(request):
 
 
 def next_ju(request, ju_id):
-    if ju_id:
-        current_ju = Ju.objects.filter(id=ju_id).first()
-        next_ = Ju.objects.exclude(status__in=['testing','close']).filter(updated_at__lt=current_ju.updated_at).exclude(id=current_ju.id).first()
+    current_ju = Ju.objects.filter(id=ju_id).first()
+    if current_ju:
+        if request.user.is_authenticated:
+            next_ = request.user.next_ju(current_ju)
+        else:
+            next_ = current_ju.next()
         if next_:
             return order(request, next_.id)
-    return render_home_page(request, Ju.active_ju())
+    if request.user.is_authenticated:
+        current_ju = request.user.active_ju()
+    else:
+        current_ju = Ju.active_ju()
+    return render_home_page(request, current_ju)
     
 def view_list(request, list_id):
     list_ = List.objects.filter(id = list_id).first()

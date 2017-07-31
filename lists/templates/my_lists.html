@@ -1,6 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'list_base.html' %}
 {% block header_text %}我的凑单{% endblock %}
 {% block list_form %}{% endblock %}
+{% block order_form %}{% endblock %}
 {% block extra_content %}
     <h2>账号：{{ owner.email }}的凑单</h2>
     <h3>群组名称：{{ owner.depart_name }}</h3>

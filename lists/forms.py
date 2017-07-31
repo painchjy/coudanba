@@ -26,11 +26,11 @@ class ListForm(forms.models.ModelForm):
         fields = ['owner']
 
     owner = MyModelChoiceField(
-                queryset= User.objects.filter(email=''),
-                empty_label="可代理群内其他账户下单",
-                widget=forms.Select(attrs={'class':'form-control input-md'}),
-                label="选择账户：",
-                required = False,
+        queryset= User.objects.filter(email=''),
+        empty_label="可代理群内其他账户下单",
+        widget=forms.Select(attrs={'class':'form-control input-md'}),
+        label="选择账户：",
+        required = False,
     )
     
     def __init__(self, *args, **kwargs):

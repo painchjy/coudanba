@@ -1,0 +1,12 @@
+{% extends 'ju_base.html' %}
+{% block header_text %}活动地点{% endblock %}
+{% block location_form_action %} {% url 'view_location'  location.id %} {% endblock %}
+{% block ju_form %} {% endblock %}
+{% block extra_content %}
+    <h3>活动地点列表</h3>
+    <ul>
+	{% for l in locations %}
+	<li><a href="{{ l.get_absolute_url}}">{{l.name}}</a></li>
+	{% endfor %}
+    </ul>
+{% endblock %}

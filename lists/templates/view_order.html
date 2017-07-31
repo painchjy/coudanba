@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'list_base.html' %}
 {% block header_text %}
 	{% if list.agent and list.agent != list.owner %}
 	订单代理人：{{list.agent.display_name}}
@@ -9,8 +9,6 @@
 {% endblock %}
 {% block order_form_action %}{% url 'view_order' list.id %}{% endblock %}
 {% block new_agent_form_inputs %}
-{% endblock %}
-{% block ju_form %}
 {% endblock %}
 {% block table %}
     <table id="id_orders_table" class="table">

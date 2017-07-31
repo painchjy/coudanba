@@ -1,7 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'ju_base.html' %}
 {% block header_text %}新建凑单活动{% endblock %}
-{% block list_form %}{% endblock %}
-{% block order_form %}{% endblock %}
+{% block location_form %}{% endblock %}
 {% block ju_form_action %} {% url 'new_ju' %} {% endblock %}
 {% block extra_content %}
     <h2>账号：{{ owner.email }}创建的活动</h2>

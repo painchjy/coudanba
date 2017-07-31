@@ -1,6 +1,6 @@
 from django import forms
 from lists.models import Item as ListItem, List
-from jus.models import Ju, Item, STATUS_CHOICES
+from jus.models import Ju, Item, STATUS_CHOICES, Location, LocationDepart
 from django.core.exceptions import ValidationError
 import shlex
 import re
@@ -12,20 +12,79 @@ User = get_user_model()
 EMPTY_ITEM_ERROR = "You can't have an empty list item"
 JU_FORMAT_ERROR = "管理凑单活动太复杂了"
 TOO_LONG_ERROR = "输入太多了"
+class LocationForm(forms.models.ModelForm):
+
+    class Meta:
+        model = Location 
+        fields = ('name',)
+        widgets = {
+            'name': forms.fields.TextInput(attrs={
+                'placeholder': '输入地点的说明',
+                'class': 'form-control input-md',
+            }),
+        }
+        error_messages = {
+            'name': {'required': EMPTY_ITEM_ERROR },
+        }
+    def __init__(self, location=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if location:
+            self.instance = location
+            self.fields['name'].initial = location.name
+
+    def save(self, location = None, depart_names = None):
+        if not location:
+            location = Location()
+        location.name = self.cleaned_data['name']
+        location.save()
+
+        if depart_names:
+            for ld in location.locationdepart_set.all():
+                ld.delete()
+
+            for dn in depart_names:
+                LocationDepart.objects.create(location=location, depart_name=dn)
+
+        return location
+
+class LocationDepartForm(forms.models.ModelForm):
+    depart_names = forms.MultipleChoiceField(
+        widget=forms.SelectMultiple(
+            attrs={
+                'class': 'form-control input-md'
+            }
+        ),
+    )
+    class Meta:
+        model = LocationDepart
+        fields = ('depart_name',)
+
+    def __init__(self,location=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['depart_names'].choices = User.objects.all().values_list(
+            'depart_name','depart_name').distinct()
+        self.fields['depart_names'].label =  '授权群组：'
+        if location:
+            selecteddepart = [d.depart_name for d in location.locationdepart_set.all()]
+            self.fields['depart_names'].initial =  [d.depart_name for d in location.locationdepart_set.all()]
+
+class LocationModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.name
 
 class JuItemForm(forms.models.ModelForm):
 
     class Meta:
         model = Ju
-        fields = ('items','stop_date_time','status','address','ju_type')
+        fields = ('items','stop_date_time','status','address','ju_type','location')
         widgets = {
             'address': forms.fields.TextInput(attrs={
                 'placeholder': '可以输入活动地点和要求',
-                'class': 'form-control input-lg',
+                'class': 'form-control input-md',
             }),
             'items': forms.Textarea(attrs={
                 'placeholder': '#@!@#$$%%#',
-                'class': 'form-control input-lg',
+                'class': 'form-control input-md',
             }),
             'stop_date_time': forms.DateTimeInput(attrs={
                 'input_formats':["%Y-%m-%d %H:%M","%Y-%m-%dT%H:%M","%Y-%m-%d %H:%M:%S"],
@@ -44,12 +103,21 @@ class JuItemForm(forms.models.ModelForm):
             'stop_date_time': '截止时间：',
             'status': '状态：',
             'ju_type': '活动类型：',
+            'location': '活动地点：',
         }
         error_messages = {
             'address': {'required': EMPTY_ITEM_ERROR },
             'items': {'required': EMPTY_ITEM_ERROR , 'invalid': JU_FORMAT_ERROR},
             'stop_date_time':{'invalid': '日期格式:YYYY-MM-DD HH:MM'}
         }
+    
+    location = LocationModelChoiceField(
+        queryset= Location.objects.none(),
+        empty_label="选择地点",
+        widget=forms.Select(attrs={'class':'form-control input-md'}),
+        label = '活动地点：',
+        required = False,
+    )
 
     def save(self, owner=None, ju=None):
         if not ju:
@@ -59,6 +127,7 @@ class JuItemForm(forms.models.ModelForm):
         ju.stop_date_time = self.cleaned_data['stop_date_time']
         ju.status = self.cleaned_data['status']
         ju.ju_type = self.cleaned_data['ju_type']
+        ju.location = self.cleaned_data['location']
         if owner:
             ju.owner = owner
         try:

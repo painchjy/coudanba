@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block forms %}
+{% block list_form %}
+<form method="POST" action="{% block form_action %}{% endblock %}">
+  <div class="form-inline"
+    <div class="form_group">
+    {{ form.text }}
+    <input type="submit" class="btn btn-primary mx-sm-2" value="提交"  style="vertical-align:-8px;" />
+    </div>
+  </div>
+   {% csrf_token %}
+    {% if form.errors %}
+      <div class="form-group has-error">
+  	<span class="help-block">
+	{{ form.text.errors }}
+	</span>
+      </div>
+    {% endif %}
+</form>
+{% endblock %}
+{% block order_form %}
+<form method="POST" action="{% block order_form_action %}{% endblock %}">
+  {% block new_agent_form_inputs %}
+  <div class="form-inline">
+    <div class="form-group">
+      <label for="{{form_list.owner.id_for_label}}">{{form_list.owner.label}}</label>
+      {{ form_list.owner }}
+    </div>
+  </div>
+  {% endblock %}
+  <div class="form-inline">
+    <div class="form_group">
+    {{ form.text }}
+    <input type="submit" class="btn btn-primary mx-sm-2" value="提交"  style="vertical-align:-8px;" />
+    </div>
+  </div>
+   {% csrf_token %}
+    {% if form.errors %}
+      <div class="form-group has-error">
+  	<span class="help-block">
+	{{ form.text.errors }}
+	{{ form_list.owner.errors }}
+	</span>
+      </div>
+    {% endif %}
+</form>
+{% endblock %}
+{% endblock %}
+	
