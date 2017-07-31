@@ -90,6 +90,9 @@
 		<td style='text-align: right'>{{ju.ju_type_name}}</td>
 		<td style='text-align: right'>{{ju.owner.display_name}}</td>
 		<td style='text-align: center'>
+		    <a href="{% url 'order' ju.id %}" class="btn btn-info">
+				下单/查看
+		    </a>
 		    <a href="{{ ju.get_absolute_url}}" class="btn btn-info">管理</a>
 		</td>
 	</tr>

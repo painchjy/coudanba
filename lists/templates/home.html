@@ -8,7 +8,8 @@
       所有活动都凑完了
 {% endif %}
     {% if request.user.is_authenticated %}
-    <a href={% url 'new_ju' %}>发起活动</a>
+    <a href={% url 'new_ju' %}>发起活动</a> &nbsp
+    <a href={% url 'list_jus' %}>活动列表</a>
     {% endif %}
 	<br/>
 	<br/>
