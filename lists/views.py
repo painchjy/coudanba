@@ -40,7 +40,10 @@ def order(request, ju_id):
     try:
         current_ju = Ju.objects.get(id=ju_id)
     except :
-        current_ju = Ju.active_ju
+        if request.user.is_authenticated:
+            current_ju = request.user.active_ju()
+        else:
+            current_ju = Ju.active_ju()
         return render_home_page(request, current_ju)
 
     if request.user.is_authenticated :
@@ -68,7 +71,10 @@ def new_order(request, ju_id):
     try:
         current_ju = Ju.objects.get(id=ju_id)
     except :
-        current_ju = Ju.active_ju
+        if request.user.is_authenticated:
+            current_ju = request.user.active_ju()
+        else:
+            current_ju = Ju.active_ju()
         return render_home_page(request, current_ju)
 
     depart_name = None
@@ -115,7 +121,10 @@ def my_lists(request, email):
         return redirect('/')
 
 def home_page(request):
-    current_ju = Ju.active_ju()
+    if request.user.is_authenticated:
+        current_ju = request.user.active_ju()
+    else:
+        current_ju = Ju.active_ju()
 
     if request.user.is_authenticated and current_ju:
         return order(request, current_ju.id)
