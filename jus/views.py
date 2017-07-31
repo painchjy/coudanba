@@ -100,6 +100,7 @@ def new_ju(request):
     form.fields['location'].queryset = owner.permitted_locations()
     if request.method == 'POST':
         form = JuItemForm(data=request.POST)
+        form.fields['location'].queryset = owner.permitted_locations()
         if form.is_valid():
             ju = form.save(owner=owner)
             if ju:
