@@ -65,10 +65,13 @@
     截止时间：{{ current_ju.stop_date_time|date:'Y-m-d H:i' }}<br/>
     活动状态：{{ current_ju.status_name }}    
     </h3>
-    <h3><a href={% url 'next_ju' current_ju.id %}>换一个活动</a> &nbsp
+    <h3><a href={% url 'next_ju' current_ju.id %}>换一个</a> &nbsp
     {% if request.user.is_authenticated %}
     <a href={% url 'list_jus' %}>活动列表</a> &nbsp
     <a href={% url 'new_ju' %}>发起活动</a>
+    	{% if not current_ju.parent %}
+    <a href={% url 'new_ju' p_id=current_ju.id %}>发起子活动</a>
+    	{% endif %}
     {% endif %}
     </h3>
     <table id="id_ju_table" class="table">
@@ -76,7 +79,7 @@
 		<th style='text-align: center;'>代号</th>
 		<th style='text-align: center;'>说明</th>
 		<th style='text-align: center;'>单价</th>
-		<th style='text-align: center;'>总凑单数</th>
+		<th style='text-align: center;'>凑单数</th>
 	</tr>
     {% for k,v in current_ju.sorted_items %}
 	<tr>

@@ -43,7 +43,13 @@
       {{ form.address }}
     </div>
     <div class="form-group">
-      <label for="{{form.location.id_for_label}}">{{form.location.label}}</label>
+	    {% if form.location.initial %}
+	    <a href="{% url 'view_location' form.location.initial.id %}">
+	    {% else %}
+	    <a href="{% url 'new_location' %}">
+	     {% endif %}
+      {{form.location.label}}
+	    </a>
       {{ form.location }}
     </div>
     <div class="form-group">

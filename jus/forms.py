@@ -63,7 +63,7 @@ class LocationDepartForm(forms.models.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['depart_names'].choices = User.objects.all().values_list(
             'depart_name','depart_name').distinct()
-        self.fields['depart_names'].label =  '授权群组：'
+        self.fields['depart_names'].label =  '选择需要包含的群组：'
         if location:
             selecteddepart = [d.depart_name for d in location.locationdepart_set.all()]
             self.fields['depart_names'].initial =  [d.depart_name for d in location.locationdepart_set.all()]
@@ -76,7 +76,7 @@ class JuItemForm(forms.models.ModelForm):
 
     class Meta:
         model = Ju
-        fields = ('items','stop_date_time','status','address','ju_type','location')
+        fields = ( 'items','stop_date_time','status','address','ju_type','location')
         widgets = {
             'address': forms.fields.TextInput(attrs={
                 'placeholder': '可以输入活动地点和要求',
@@ -103,7 +103,6 @@ class JuItemForm(forms.models.ModelForm):
             'stop_date_time': '截止时间：',
             'status': '状态：',
             'ju_type': '活动类型：',
-            'location': '活动地点：',
         }
         error_messages = {
             'address': {'required': EMPTY_ITEM_ERROR },
@@ -113,13 +112,13 @@ class JuItemForm(forms.models.ModelForm):
     
     location = LocationModelChoiceField(
         queryset= Location.objects.none(),
-        empty_label="选择地点",
+        empty_label="选择范围",
         widget=forms.Select(attrs={'class':'form-control input-md'}),
-        label = '活动地点：',
+        label = '活动范围(如不选，则所有用户都可参加)：',
         required = False,
     )
 
-    def save(self, owner=None, ju=None):
+    def save(self, owner=None, ju=None, parent=None):
         if not ju:
             ju =Ju(owner=owner)    
         ju.address = self.cleaned_data['address']
@@ -128,6 +127,13 @@ class JuItemForm(forms.models.ModelForm):
         ju.status = self.cleaned_data['status']
         ju.ju_type = self.cleaned_data['ju_type']
         ju.location = self.cleaned_data['location']
+        if parent:
+            ju.parent = parent
+        if ju.parent:
+            err_item_keys = [key for key in ju.items.keys() if key not in ju.parent.items.keys()]
+            if err_item_keys:
+                self.add_error('items', '代号{}在主活动中没有，请修改项目定义'.format('、'.join(err_item_keys)))
+                return
         if owner:
             ju.owner = owner
         try:

@@ -48,7 +48,7 @@ class Ju(models.Model):
         super(Ju, self).__init__(*args, **kwargs)
         self.sorted_items_ = None
 
-    
+    parent = models.ForeignKey('self',related_name='sub_jus', blank=True, null=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     location = models.ForeignKey(Location, blank=True, null=True)
     content = models.TextField(default='')
@@ -181,5 +181,9 @@ class Item(models.Model):
 
     def total_qty(self):
         return sum([i.qty for i in ListItem.objects.filter(list__ju=self.ju,name=self.key)])
+    def total_qty_with_sub(self):
+        jus = self.ju.sub_jus_set.all()
+        jus.append(self.ju)
+        return sum([i.qty for i in ListItem.objects.filter(list__ju__in=jus,name=self.key)])
 
 

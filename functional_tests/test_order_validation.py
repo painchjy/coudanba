@@ -48,3 +48,27 @@ class OrderValidation(FunctionalTest):
             "下单数量必须为0.10的倍数",
             self.get_error_element().text,
         ))
+        
+        # edith觉得输入空格太麻烦，直接输入编号和份数，发现也能成功 
+        inputbox = self.get_item_input_box()
+        inputbox.clear()
+        inputbox.send_keys('A2')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_orders_table({'A': '2'}, active_ju, email, 'N/A')
+
+        # edith想给活动发起人留言，输入编号和份数后面增加了留言，
+        # 发现留言出现在自己的订单上。
+        inputbox = self.get_item_input_box()
+        inputbox.clear()
+        inputbox.send_keys('A1周四下午提货')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_orders_table({'A': '1'}, active_ju, email, 'N/A', memo='周四下午提货')
+
+        # edith输入编号B和份数后面增加了留言，
+        # 发现留言更新了，原来的留言被覆盖了。
+        inputbox = self.get_item_input_box()
+        inputbox.clear()
+        inputbox.send_keys('B1周四下午提货')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_orders_table({'B': '1'}, active_ju, email, 'N/A', memo='周四下午提货')
+

@@ -84,27 +84,40 @@ def view_ju(request, ju_id):
             form.save(owner=request.user, ju=ju)
     return render(request, 'manage_ju.html', { 'current_ju': ju,  'form': form})
 
-def new_ju(request):
+def new_ju(request, p_id=None):
+    parent = None
+    if p_id:
+        parent = Ju.objects.filter(id=p_id).first()
+        
     if not request.user.is_authenticated:
         return redirect('/')
     owner = request.user
     form = JuItemForm()
-    form.fields['items'].initial = json.dumps(
-        {
-            "A":{"desc":"较完整的项目","price":0,"href":"http://...","max_total_qty":100,"max_qty":10},
-            "B":{"desc":"最简单的项目"},
-        },
-        ensure_ascii=False,
-        indent=1
-    )
+    if parent:
+        form.fields['items'].initial = json.dumps(
+            parent.items,
+            ensure_ascii=False,
+            indent=1
+        )
+    else:
+        form.fields['items'].initial = json.dumps(
+            {
+                "A":{"desc":"较完整的项目","price":0,"href":"http://...","max_total_qty":100,"max_qty":10},
+                "B":{"desc":"最简单的项目"},
+            },
+            ensure_ascii=False,
+            indent=1
+        )
     form.fields['location'].queryset = owner.permitted_locations()
     if request.method == 'POST':
         form = JuItemForm(data=request.POST)
         form.fields['location'].queryset = owner.permitted_locations()
         if form.is_valid():
-            ju = form.save(owner=owner)
+            ju = form.save(owner=owner,parent=parent)
             if ju:
                 return redirect(ju)
+    if p_id:
+        return render(request, 'new_ju.html', {'form': form, 'owner': owner, 'p_id': p_id })
     return render(request, 'new_ju.html', {'form': form, 'owner': owner})
 
 def list_jus(request):
