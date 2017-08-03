@@ -88,12 +88,12 @@ def view_ju(request, ju_id):
     form.fields['stop_date_time'].initial = ju.stop_date_time
     form.fields['status'].initial = ju.status
     form.fields['ju_type'].initial = ju.ju_type
-    form.fields['location'].queryset = ju.owner.permitted_locations()
+    form.fields['location'].queryset = ju.owner.prefered_locations()
     form.fields['location'].initial = ju.location
 
     if request.method == 'POST':
         form = JuItemForm(data=request.POST)
-        form.fields['location'].queryset = ju.owner.permitted_locations()
+        form.fields['location'].queryset = ju.owner.prefered_locations()
         if form.is_valid():
             form.save(owner=request.user, ju=ju)
     return render(request, 'manage_ju.html', { 'current_ju': ju,  'form': form})
@@ -122,10 +122,10 @@ def new_ju(request, p_id=None):
             ensure_ascii=False,
             indent=1
         )
-    form.fields['location'].queryset = owner.permitted_locations()
+    form.fields['location'].queryset = owner.prefered_locations()
     if request.method == 'POST':
         form = JuItemForm(data=request.POST)
-        form.fields['location'].queryset = owner.permitted_locations()
+        form.fields['location'].queryset = owner.prefered_locations()
         if form.is_valid():
             ju = form.save(owner=owner,parent=parent)
             if ju:
