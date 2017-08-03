@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import auth, messages
-from accounts.forms import EmailInputForm, UserInviteForm
+from accounts.forms import EmailInputForm, UserInviteForm, UserForm
+from jus.models import Location
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -37,3 +38,11 @@ def user_invite(request):
         if form.is_valid():
             form.invite(request)
     return render(request, 'user_invite.html', { 'form': form, 'owner': request.user})
+
+def profile(request):
+    form = UserForm(instance=request.user)
+    if request.method == 'POST':
+        form = UserForm(instance=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+    return render(request, 'profile.html', { 'form': form, 'locations': Location.objects.all()})

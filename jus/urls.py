@@ -24,4 +24,6 @@ urlpatterns = [
     url(r'^new/p_id=(?P<p_id>\d+)/$',views.new_ju, name='new_ju' ),
     url(r'^location/$',views.new_location, name='new_location' ),
     url(r'^location/(\d+)/$',views.view_location, name='view_location' ),
+    url(r'^location/follow/(\d+)/$',views.follow, name='follow' ),
+    url(r'^location/unfollow/(\d+)/$',views.unfollow, name='unfollow' ),
 ]

@@ -44,8 +44,8 @@ class List(models.Model):
     @property
     def qtys_by_ju(self):
         qtys=[]
-        if self.ju.sorted_items:
-            for k,v in self.ju.sorted_items:
+        if self.ju.items:
+            for k in sorted(self.ju.items.keys()):
                 try:
                     qty = Item.objects.get(list=self, text__istartswith=k).qty
                 except:

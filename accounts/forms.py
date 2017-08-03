@@ -6,6 +6,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 import re
 User = get_user_model()
+EMPTY_ITEM_ERROR = "户名和部门都不可为空"
+TOO_LONG_ERROR = "输入太多了"
 EMPTY_EMAIL_LIST_ERROR = '请输入有效的邮箱列表'
 EMPTY_GROUP_NAME_ERROR = '请输入群组名称'
 EMPTY_MEMO_ERROR = '请输入邀请函正文'
@@ -104,4 +106,34 @@ class UserInviteForm(EmailInputForm):
             f'邀请函已发送给了{email}。'
         )
         return True
+
+class UserForm(forms.models.ModelForm):
+    class Meta:
+        model = User
+        fields = ['display_name','depart_name']
+        widgets = {
+            'display_name': forms.fields.TextInput(attrs={
+                'placeholder': '输入格式建议：昵称（移动短号）',
+                'class': 'form-control input-md', 
+            }),
+            'depart_name': forms.fields.TextInput(attrs={
+                'placeholder': '可以输入所属部门名称或自建群组名称',
+                'class': 'form-control input-md', 
+            }),
+        }
+        error_messages = {
+                'depart_name': {'required': EMPTY_ITEM_ERROR,'max_length': TOO_LONG_ERROR },
+                'display_name': {'required': EMPTY_ITEM_ERROR,'max_length': TOO_LONG_ERROR }
+        }
+        labels = {
+                'depart_name': '群组名称(缺省为部门名称，可以新建群组)',
+                'display_name': '账户名称',
+        }
+    
+#    def __init__(self, *args, **kwargs):
+#        user = kwargs.pop('user', None)
+#        self.instance = user
+#        super().__init__(*args, **kwargs)
+
+
 

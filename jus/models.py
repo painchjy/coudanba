@@ -29,11 +29,17 @@ class Location(models.Model):
     name = models.CharField(default='', max_length=300)
     def get_absolute_url(self):
         return reverse('view_location', args=[self.id])
+    def jus_counts(self):
+        return self.ju_set.count()
+    def lists_counts(self):
+        return sum([ju.list_set.count() for ju in self.ju_set.all()])
 
 class LocationDepart(models.Model):
     location = models.ForeignKey(Location, blank=True, null=True)
     depart_name = models.CharField(default='', max_length=300)
-
+class LocationUser(models.Model):
+    location = models.ForeignKey(Location, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
 class Product(models.Model):
    
     name = models.CharField(default='', max_length=300)
@@ -89,6 +95,16 @@ class Ju(models.Model):
     def ju_type_name(self):
         d = dict(JU_TYPE_CHOICES)
         return d.get(self.ju_type,'')
+    def family_members(self):
+        if self.parent:
+            return self.parent.family_members()
+        members = [m for m in self.sub_jus.all()]
+        # members = self.sub_jus.all()
+        if members:
+            members.append(self)
+        else:
+            members = [self]
+        return members
 
     @property
     def sorted_items(self):
@@ -97,15 +113,22 @@ class Ju(models.Model):
         i_ = dict(self.items.items())
         self.sorted_items_ = sorted(self.items.items())
         try:
+            print('----items:{}'.format(i_))
             for k, v in self.sorted_items_:
                 qty_sum = sum(
                     i.qty for i in ListItem.objects.filter(
                         list__ju=self, 
                         text__istartswith=k
                 ))
-                i_[k].update({'qty_sum': qty_sum})
+                qty_family_sum = sum(
+                    i.qty for i in ListItem.objects.filter(
+                        list__ju__in=self.family_members(), 
+                        text__istartswith=k
+                ))
+                i_[k].update({'qty_sum': qty_sum, 'qty_family_sum': qty_family_sum})
                 self.sorted_items_ = sorted(i_.items())
         except Exception as e:
+            print('----exception:{}'.format(e))
             return  []
         return self.sorted_items_
 

@@ -16,7 +16,11 @@
 		    {% if user.email %}
 		      <ul class="nav navbar-nav navbar-right">
 			<li class="navbar-text">群组：{{user.depart_name}} </li>
-			<li class="navbar-text">账号： {{ user.display_name }} </li>
+			<li class="navbar-text">
+				<a href="{% url 'profile' %}">
+					账号： {{ user.display_name }} 
+				</a>
+			</li>
 			<li><a href="{% url 'user_invite' %}">邀请</a></li>
 			<li><a href="{% url 'logout' %}">注销</a></li>
 		      </ul>
@@ -79,7 +83,8 @@
 		<th style='text-align: center;'>代号</th>
 		<th style='text-align: center;'>说明</th>
 		<th style='text-align: center;'>单价</th>
-		<th style='text-align: center;'>凑单数</th>
+		<th style='text-align: center;'>子单数</th>
+		<th style='text-align: center;'>总单数</th>
 	</tr>
     {% for k,v in current_ju.sorted_items %}
 	<tr>
@@ -100,6 +105,7 @@
 		</td>
 		<td style='text-align: right;'>{{ v.price|floatformat:2 }} </td>
 		<td style='text-align: right;'>{{ v.qty_sum|floatformat:2 }} </td>
+		<td style='text-align: right;'>{{ v.qty_family_sum|floatformat:2 }} </td>
 	</tr>
     {% endfor %}
     </table>

@@ -1,13 +1,27 @@
 from django.shortcuts import redirect, render
-from jus.models import Ju, Location
+from jus.models import Ju, Location,LocationUser
 from lists.models import Item, List
 from jus.forms import JuItemForm, LocationForm, LocationDepartForm
 from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 import csv,json
 User = get_user_model()
-
+def follow(request, l_id):
+    location = Location.objects.filter(id=l_id).first()
+    if location and request.user.is_authenticated:
+        lu = LocationUser.objects.filter(location=location, user=request.user).first()
+        if not lu:
+            lu = LocationUser.objects.create(location=location, user=request.user)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+def unfollow(request, l_id):
+    location = Location.objects.filter(id=l_id).first()
+    if location and request.user.is_authenticated:
+        lu = LocationUser.objects.filter(location=location, user=request.user).first()
+        if lu:
+            lu.delete()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 def view_location(request, location_id):
     if not request.user.is_authenticated:
         return redirect('/')

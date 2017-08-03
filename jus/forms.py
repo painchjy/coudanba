@@ -19,7 +19,7 @@ class LocationForm(forms.models.ModelForm):
         fields = ('name',)
         widgets = {
             'name': forms.fields.TextInput(attrs={
-                'placeholder': '输入地点的说明',
+                'placeholder': '输入活动范围的说明',
                 'class': 'form-control input-md',
             }),
         }
@@ -79,7 +79,7 @@ class JuItemForm(forms.models.ModelForm):
         fields = ( 'items','stop_date_time','status','address','ju_type','location')
         widgets = {
             'address': forms.fields.TextInput(attrs={
-                'placeholder': '可以输入活动地点和要求',
+                'placeholder': '可以输入收货地点和要求',
                 'class': 'form-control input-md',
             }),
             'items': forms.Textarea(attrs={
