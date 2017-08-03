@@ -6,7 +6,10 @@
     <h3>活动范围列表</h3>
     <ul>
 	{% for l in locations %}
-	<li><a href="{{ l.get_absolute_url}}">{{l.name}}</a></li>
+	<li><a href="{{ l.get_absolute_url}}">{{l.name}}</a>
+		&nbsp 活动数({{l.jus_counts}}) 
+		&nbsp 订单数({{l.lists_counts}}) 
+	</li>
 	{% endfor %}
     </ul>
 {% endblock %}

@@ -22,7 +22,8 @@
     <ul>
 	{% for l in request.user.prefered_locations %}
 	<li><a href="{{ l.get_absolute_url}}">{{l.name}}</a>
-		&nbsp 活动数({{l.jus_counts}}) 
+		&nbsp 当前活动数({{l.active_jus_counts}}) 
+		&nbsp 总活动数({{l.jus_counts}}) 
 		&nbsp 订单数({{l.lists_counts}}) 
 		&nbsp <a href="{% url 'unfollow' l.id %}">取消关注</a>
 	</li>
@@ -32,7 +33,8 @@
     <ul>
 	{% for l in locations %}
 	<li><a href="{{ l.get_absolute_url}}">{{l.name}}</a>
-		&nbsp 活动数({{l.jus_counts}}) 
+		&nbsp 当前活动数({{l.active_jus_counts}}) 
+		&nbsp 总活动数({{l.jus_counts}}) 
 		&nbsp 订单数({{l.lists_counts}}) 
 		&nbsp <a href="{% url 'follow' l.id %}">关注</a>
 	</li>

@@ -29,6 +29,8 @@ class Location(models.Model):
     name = models.CharField(default='', max_length=300)
     def get_absolute_url(self):
         return reverse('view_location', args=[self.id])
+    def active_jus_counts(self):
+        return self.ju_set.exclude(status__in=['close','testing']).count()
     def jus_counts(self):
         return self.ju_set.count()
     def lists_counts(self):

@@ -3,23 +3,12 @@
 {% block location_form_action %} {% url 'new_location' %} {% endblock %}
 {% block ju_form %} {% endblock %}
 {% block extra_content %}
-    <h3>我关注的活动范围</h3>
-    <ul>
-	{% for l in request.user.prefered_locations %}
-	<li><a href="{{ l.get_absolute_url}}">{{l.name}}</a>
-		&nbsp 活动数({{l.jus_counts}}) 
-		&nbsp 订单数({{l.lists_counts}}) 
-		&nbsp <a href="{% url 'unfollow' l.id %}">取消关注</a>
-	</li>
-	{% endfor %}
-    </ul>
     <h3>所有活动范围列表</h3>
     <ul>
 	{% for l in locations %}
 	<li><a href="{{ l.get_absolute_url}}">{{l.name}}</a>
 		&nbsp 活动数({{l.jus_counts}}) 
 		&nbsp 订单数({{l.lists_counts}}) 
-		&nbsp <a href="{% url 'follow' l.id %}">关注</a>
 	</li>
 	{% endfor %}
     </ul>
