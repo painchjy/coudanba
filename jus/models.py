@@ -114,19 +114,20 @@ class Ju(models.Model):
             return self.sorted_items_
         i_ = dict(self.items.items())
         self.sorted_items_ = sorted(self.items.items())
+
         try:
-            print('----items:{}'.format(i_))
             for k, v in self.sorted_items_:
                 qty_sum = sum(
                     i.qty for i in ListItem.objects.filter(
                         list__ju=self, 
                         text__istartswith=k
                 ))
-                qty_family_sum = sum(
-                    i.qty for i in ListItem.objects.filter(
-                        list__ju__in=self.family_members(), 
-                        text__istartswith=k
-                ))
+                #qty_family_sum = sum(
+                #    i.qty for i in ListItem.objects.filter(
+                #        list__ju__in=self.family_members(), 
+                #        text__istartswith=k
+                #))
+                qty_family_sum=0
                 i_[k].update({'qty_sum': qty_sum, 'qty_family_sum': qty_family_sum})
                 self.sorted_items_ = sorted(i_.items())
         except Exception as e:
