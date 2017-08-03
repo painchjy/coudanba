@@ -87,7 +87,7 @@ class ItemForm(forms.models.ModelForm):
                         return '凑单总量为{}份，已经达到了，请换一个品种凑单'.format(ju_item.max_total_qty)
                     if ju_item.max_qty !=None and self_qty > ju_item.max_qty:
                         return '最大下单数量为{}份，请修改数量后重新提交'.format(ju_item.max_qty)
-                    if ju_item.min_qty !=None and self_qty < ju_item.min_qty:
+                    if ju_item.min_qty !=None and self_qty !=0 and self_qty < ju_item.min_qty:
                         return '最小下单数量为{}份，请修改数量后重新提交'.format(ju_item.min_qty)
                     if ju_item.unit !=None and ((self_qty) % (ju_item.unit)) != 0:
                         return '下单数量必须为{}的倍数，请修改数量后重新提交{}%{}={}'.format(ju_item.unit,self_qty,ju_item.unit,self_qty%ju_item.unit)
