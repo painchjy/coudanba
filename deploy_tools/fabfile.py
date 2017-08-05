@@ -3,7 +3,7 @@ from fabric.api import env, local, run
 from fabric.operations import sudo
 import random
 
-REPO_URL = 'https://github.com/painchjy/book-example.git'
+REPO_URL = 'https://github.com/painchjy/coudanba.git'
 
 def deploy():
     site_folder = f'/home/{env.user}/sites/{env.host}'
