@@ -19,6 +19,7 @@ STATUS_CHOICES = (
     ('close','关闭'),
 )
 JU_TYPE_CHOICES = (
+    ('category','产品目录'),
     ('order','凑单'),
     ('didi','拼车'),
     ('plan','预算'),
