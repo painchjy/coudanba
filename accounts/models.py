@@ -37,6 +37,14 @@ class User(models.Model):
         if ju_type:
             return Ju.active_jus(ju_type=ju_type, locations=self.prefered_locations())
         return Ju.active_jus(locations=self.prefered_locations())
+    def active_categories(self):
+        return self.active_jus(ju_type='category')
+
+    def created_categories(self):
+        return self.ju_set.filter(ju_type='category')
+
+    def created_jus(self):
+        return self.ju_set.exclude(ju_type='category')
 
     def active_ju(self, ju_type=None):
         if ju_type:

@@ -36,6 +36,31 @@ def view_order(request, list_id):
         { 'list': list_,'current_ju': list_.ju,  'form': form, 'orders': orders}
     )
 
+def next_category(request, ju_id):
+    current_ju = Ju.objects.filter(id=ju_id).first()
+    if current_ju:
+        if request.user.is_authenticated:
+            next_ = request.user.next_ju(current_ju, ju_type='category')
+        else:
+            next_ = current_ju.next(ju_type='category')
+        if next_:
+            return render(
+                request, 
+                'view_category.html', 
+                { 'current_ju': next_ }
+            )
+
+    return category(request)
+
+def category(request):
+    current_ju = Ju.active_ju(ju_type='category')
+    return render(
+        request, 
+        'view_category.html', 
+        { 'current_ju': current_ju }
+    )
+
+
 def order(request, ju_id):
     try:
         current_ju = Ju.objects.get(id=ju_id)

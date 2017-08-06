@@ -17,9 +17,7 @@
 		      <ul class="nav navbar-nav navbar-right">
 			<li class="navbar-text">群组：{{user.depart_name}} </li>
 			<li class="navbar-text">
-				<a href="{% url 'profile' %}">
 					账号： {{ user.display_name }} 
-				</a>
 			</li>
 			<li><a href="{% url 'user_invite' %}">邀请</a></li>
 			<li><a href="{% url 'logout' %}">注销</a></li>
@@ -57,11 +55,20 @@
 	    <div class="row">
 		<div class="col-md-6 col-md-offset-3 jumbotron">
 		    <div class="text-center">
+
+{% block nav_tabs %}
+<ul class="nav nav-tabs" id="myTab">
+  <li><a href="{% url 'home' %}">活动</a></li>
+  <li><a href="{% url 'category' %}">产品目录</a></li>
+  <li><a href="{% url 'profile' %}">设置</a></li>
+</ul>
+{% endblock %}
 		        <h4>{% block header_text %}{% endblock %}</h4>
 {% block forms_before %}
 {% endblock %}
 {% block ju_table %}
   {% if current_ju %}
+    {% if current_ju.ju_type != 'category' %}
     <h3>
     活动发起人：{{ current_ju.owner.display_name }}<br/>
     活动说明：{{ current_ju.address }}&nbsp 
@@ -78,6 +85,20 @@
     	{% endif %}
     {% endif %}
     </h3>
+    {% else %}
+    <h3>
+    联系人：{{ current_ju.owner.display_name }}<br/>
+    报价说明：{{ current_ju.address }}<br/>
+    状态：{{ current_ju.status_name }}    
+    </h3>
+    <h3><a href={% url 'next_category' current_ju.id %}>换一个</a> &nbsp
+    {% if request.user.is_authenticated %}
+    <a href={% url 'list_categories' %}>产品报价列表</a> &nbsp
+    <a href={% url 'new_ju' p_id=current_ju.id %}>发起活动</a>
+    {% endif %}
+    </h3>
+ 
+    {% endif %}
     <table id="id_ju_table" class="table">
         <tr>
 		<th style='text-align: center;'>代号</th>

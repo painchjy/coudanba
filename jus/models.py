@@ -143,6 +143,7 @@ class Ju(models.Model):
             ).first()
         return cls.objects.filter(
                 ~Q(status__in=['testing','close']),
+                ~Q(ju_type='category'),
                 Q(location__isnull=True)|Q(location__in=locations),
         ).first()
     
@@ -156,6 +157,7 @@ class Ju(models.Model):
             )
         return cls.objects.filter(
                 ~Q(status__in=['testing','close']),
+                ~Q(ju_type='category'),
                 Q(location__isnull=True)|Q(location__in=locations),
         )
 
@@ -170,6 +172,7 @@ class Ju(models.Model):
             ).first()
         return Ju.objects.filter(
             ~Q(status__in=['testing','close']),
+            ~Q(ju_type='category'),
             ~Q(id=self.id),
             Q(location__isnull=True)|Q(location__in=locations),
             Q(updated_at__lt=self.updated_at),

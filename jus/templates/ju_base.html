@@ -1,4 +1,13 @@
 {% extends 'base.html' %}
+{% block nav_tabs %}
+{% block nav_tabs_jus %}
+<ul class="nav nav-tabs" id="myTab">
+  <li class="active"><a href="{% url 'home' %}">活动</a></li>
+  <li><a href="{% url 'category' %}">产品目录</a></li>
+  <li><a href="{% url 'profile' %}">设置</a></li>
+</ul>
+{% endblock %}
+{% endblock %}
 {% block forms_before %}
 {% block location_form %}
 <form method="POST" action="{% block location_form_action %}{% endblock %}">

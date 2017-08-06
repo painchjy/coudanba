@@ -1,4 +1,11 @@
 {% extends 'ju_base.html' %}
+{% block nav_tabs_jus %}
+<ul class="nav nav-tabs" id="myTab">
+  <li><a href="{% url 'home' %}">活动</a></li>
+  <li><a href="{% url 'category' %}">产品目录</a></li>
+  <li class="active"><a href="{% url 'profile' %}">设置</a></li>
+</ul>
+{% endblock %}
 {% block header_text %}用户设置{% endblock %}
 {% block list_form %}
 {% endblock %}

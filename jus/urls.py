@@ -19,6 +19,7 @@ from jus import views
 
 urlpatterns = [
     url(r'^$',views.list_jus, name='list_jus' ),
+    url(r'^categories$',views.list_categories, name='list_categories' ),
     url(r'^(\d+)/$',views.view_ju, name='view_ju' ),
     url(r'^new/$',views.new_ju, name='new_ju' ),
     url(r'^new/p_id=(?P<p_id>\d+)/$',views.new_ju, name='new_ju' ),

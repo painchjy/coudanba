@@ -26,4 +26,6 @@ urlpatterns = [
     url(r'^loadusers/(\d+)/$',views.load_users, name='load_users' ),
     url(r'^order/(\d+)/$',views.order, name='order' ),
     url(r'^next_ju/(\d+)/$',views.next_ju, name='next_ju' ),
+    url(r'^category$',views.category, name='category' ),
+    url(r'^next_category/(\d+)/$',views.next_category, name='next_category' ),
 ]

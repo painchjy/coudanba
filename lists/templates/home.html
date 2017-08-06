@@ -5,11 +5,11 @@
       看看别人在凑什么
 </a>
 {% else %}
-      所有活动都凑完了
+您关注的范围内没有活动，检查一下“设置”页，调整关注范围<br/>
+或者尝试
 {% endif %}
     {% if request.user.is_authenticated %}
     &nbsp<a href={% url 'new_ju' %}>发起活动</a> 
-    &nbsp<a href={% url 'list_jus' %}>活动列表</a>
     {% endif %}
 	<br/>
 	<br/>

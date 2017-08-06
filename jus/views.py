@@ -113,6 +113,8 @@ def new_ju(request, p_id=None):
             ensure_ascii=False,
             indent=1
         )
+        if parent.ju_type == 'category':
+            form.fields['ju_type'].initial = 'order'
     else:
         form.fields['items'].initial = json.dumps(
             {
@@ -139,6 +141,16 @@ def list_jus(request):
         return render(
             request,
             'list_jus.html', 
+            { 
+            }
+        )
+    return redirect('/')
+
+def list_categories(request):
+    if request.user.is_authenticated:
+        return render(
+            request,
+            'list_categories.html', 
             { 
             }
         )

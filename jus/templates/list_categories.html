@@ -1,0 +1,62 @@
+{% extends 'ju_base.html' %}
+{% block nav_tabs_jus %}
+<ul class="nav nav-tabs" id="myTab">
+  <li><a href="{% url 'home' %}">活动</a></li>
+  <li class="active"><a href="{% url 'category' %}">产品目录</a></li>
+  <li><a href="{% url 'profile' %}">设置</a></li>
+</ul>
+{% endblock %}
+{% block header_text %}所有产品报价目录{% endblock %}
+{% block location_form %}
+{% endblock %}
+{% block ju_form %}
+{% endblock %}
+{% block extra_content %}
+<h3>当前产品报价</h3>
+    <table id="id_jus_list" class="table">
+	<tr>
+		<th>报价说明</th>
+		<th>截止时间</th>
+		<th>活动状态</th>
+		<th>管理人</th>
+		<th>操作</th>
+	</tr>
+	{% load tz %}
+	{% for ju in request.user.active_categories %}
+	<tr>
+		<td style='text-align: center'>{{ju.address}}</td>
+		<td style='text-align: center'>{{ju.stop_date_time|date:'Y-m-d H:i'}}</td>
+		<td style='text-align: right'>{{ju.status_name}}</td>
+		<td style='text-align: right'>{{ju.owner.display_name}}</td>
+		<td style='text-align: center'>
+		    <a href="{% url 'new_ju' p_id=ju.id %}" class="btn btn-info">
+			发起活动	
+		    </a>
+		</td>
+	</tr>
+	{% endfor %}
+    </table>
+<h3>我创建的产品报价</h3>
+    <table id="id_jus_list" class="table">
+	<tr>
+		<th>报价说明</th>
+		<th>截止时间</th>
+		<th>活动状态</th>
+		<th>管理人</th>
+		<th>操作</th>
+	</tr>
+	{% load tz %}
+	{% for ju in request.user.created_categories %}
+	<tr>
+		<td style='text-align: center'>{{ju.address}}</td>
+		<td style='text-align: center'>{{ju.stop_date_time|date:'Y-m-d H:i'}}</td>
+		<td style='text-align: right'>{{ju.status_name}}</td>
+		<td style='text-align: right'>{{ju.owner.display_name}}</td>
+		<td style='text-align: center'>
+		    <a href="{{ ju.get_absolute_url}}" class="btn btn-info">管理</a>
+		</td>
+	</tr>
+	{% endfor %}
+    </table>
+{% endblock %}
+

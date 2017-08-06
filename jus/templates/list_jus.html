@@ -81,7 +81,7 @@
 		<th>操作</th>
 	</tr>
 	{% load tz %}
-	{% for ju in request.user.ju_set.all %}
+	{% for ju in request.user.created_jus %}
 	<tr>
 		<td style='text-align: center'>{{ju.address}}</td>
 		<td style='text-align: center'>{{ju.location.name}}</td>

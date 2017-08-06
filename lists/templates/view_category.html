@@ -1,0 +1,23 @@
+{% extends 'list_base.html' %}
+{% block nav_tabs_lists %}
+<ul class="nav nav-tabs" id="myTab">
+  <li><a href="{% url 'home' %}">活动</a></li>
+  <li class="active"><a href="{% url 'category' %}">产品目录</a></li>
+  <li><a href="{% url 'profile' %}">设置</a></li>
+</ul>
+{% endblock %}
+{% block header_text %}
+  {% if current_ju %}
+  	产品报价不能直接下单，找到你需要的产品，发起凑单活动后下单,每项产品的提货时间和提货方式请和报价联系人确认。
+  {% else %}
+  目前没有产品报价，试着自己
+  <a href="{% url 'new_ju' %}">发布一个产品报价</a>
+  {% endif %}
+	
+{% endblock %}
+
+{% block list_form %}
+{% endblock %}
+{% block order_form %}{% endblock %}
+{% block table %}
+{% endblock %}
