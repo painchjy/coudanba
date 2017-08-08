@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import auth, messages
-from accounts.forms import EmailInputForm, UserInviteForm, UserForm
+from accounts.forms import EmailInputForm, UserInviteForm, UserForm, WeChatRegistForm
 from jus.models import Location
 from django.contrib.auth import get_user_model
+from django.http import JsonResponse
 User = get_user_model()
-
 
 
 def login(request):
@@ -14,6 +14,23 @@ def login(request):
 
     return redirect('/')
 
+def wechat_regist(request):
+    if not request.user.is_authenticated:
+        return redirect('/')
+    if not request.user.is_admin():
+        return redirect('/')
+    form = WeChatRegistForm()
+    if request.method == 'POST':
+        form = WeChatRegistForm(data=request.POST)
+        if form.is_valid():
+            login_url = form.regist_wechat(request)
+            return JsonResponse({'login_url': login_url})
+    if form.errors:
+        messages.warning(
+            request,
+            form.errors['openid']
+        )
+    return render(request, 'wechat_regist.html', { 'form': form })
 
 def send_login_email(request):
     form = EmailInputForm()

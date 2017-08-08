@@ -9,11 +9,16 @@ class User(models.Model):
     email = models.EmailField(primary_key=True)
     depart_name = models.TextField(default='N/A')
     display_name = models.TextField(default='' )
+    group_name = models.TextField(default='' )
     REQUIRED_FIELDS = []
     USERNAME_FIELD = 'email'
     is_anonymous = False
     is_authenticated = True
 
+    def is_admin(self):
+        if self.email in ['13916341082@qq.com','zhang_jianhua@bankcomm.com','yeyt@bankcomm.com']:
+            return True
+        return False
     def prefered_locations(self):
         return Location.objects.filter(
             id__in=LocationDepart.objects.filter(

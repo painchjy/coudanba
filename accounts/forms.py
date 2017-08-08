@@ -11,6 +11,7 @@ TOO_LONG_ERROR = "输入太多了"
 EMPTY_EMAIL_LIST_ERROR = '请输入有效的邮箱列表'
 EMPTY_GROUP_NAME_ERROR = '请输入群组名称'
 EMPTY_MEMO_ERROR = '请输入邀请函正文'
+EMPTY_ERROR = '输入文本不可为空'
 class EmailInputForm(forms.Form):
     email = forms.EmailField(
         widget = forms.TextInput(attrs={
@@ -106,6 +107,80 @@ class UserInviteForm(EmailInputForm):
             f'邀请函已发送给了{email}。'
         )
         return True
+
+class WeChatRegistForm(forms.Form):
+    openid = forms.CharField(
+        required = True, 
+        max_length = 120,
+        label = "微信openid",
+        widget = forms.TextInput(attrs={
+            'placeholder': '输入openid',
+            'class': 'form-control input-sm',
+            }),
+        error_messages = {
+            'required': EMPTY_ERROR
+            }
+        )
+    depart_name = forms.CharField(
+        required = True, 
+        max_length = 20,
+        label = "所属部门",
+        widget = forms.TextInput(attrs={
+            'placeholder': '输入部门名称',
+            'class': 'form-control input-sm',
+            }),
+        error_messages = {
+            'required': EMPTY_ERROR
+            }
+        )
+    group_name = forms.CharField(
+        required = True, 
+        max_length = 20,
+        label = "公众号名称",
+        widget = forms.TextInput(attrs={
+            'placeholder': '输入公众号名称',
+            'class': 'form-control input-sm',
+            }),
+        error_messages = {
+            'required': EMPTY_ERROR
+            }
+        )
+    display_name = forms.CharField(
+        required = True, 
+        max_length = 220,
+        label = "群内备注或昵称",
+        widget = forms.TextInput(attrs={
+            'placeholder': '输入群内备注或昵称',
+            'class': 'form-control input-sm',
+            }),
+        error_messages = {
+            'required': EMPTY_ERROR
+            }
+        )
+    def regist_wechat(self,request):
+        openid = self.cleaned_data['openid']
+        display_name = self.cleaned_data['display_name']
+        group_name = self.cleaned_data['group_name']
+        depart_name = self.cleaned_data['depart_name']
+       
+        user, created = User.objects.update_or_create(
+                email=openid, 
+                defaults={
+                    'display_name': display_name, 
+                    'depart_name': depart_name,
+                    'group_name': group_name
+                }
+            )
+        token = Token.objects.create(email=openid)
+        url = request.build_absolute_uri(
+            reverse('login') + '?token=' + str(token.uid)
+        )
+        messages.success(
+            request,
+            "登录链接已返回。"
+        )
+        return url
+
 
 class UserForm(forms.models.ModelForm):
     class Meta:
