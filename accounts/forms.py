@@ -179,7 +179,7 @@ class WeChatRegistForm(forms.Form):
             request,
             "登录链接已返回。"
         )
-        return url
+        return {'login_url': url, 'openid': openid, 'group_name': group_name }
 
 
 class UserForm(forms.models.ModelForm):

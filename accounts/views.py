@@ -23,8 +23,9 @@ def wechat_regist(request):
     if request.method == 'POST':
         form = WeChatRegistForm(data=request.POST)
         if form.is_valid():
-            login_url = form.regist_wechat(request)
-            return JsonResponse({'login_url': login_url})
+            json = form.regist_wechat(request)
+            if json:
+                return JsonResponse(json)
     if form.errors:
         messages.warning(
             request,
