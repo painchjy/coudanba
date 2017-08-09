@@ -10,6 +10,7 @@
 {% endif %}
     {% if request.user.is_authenticated %}
     &nbsp<a href={% url 'new_ju' %}>发起活动</a> 
+    &nbsp<a href={% url 'list_jus' %}>活动列表</a> 
     {% endif %}
 	<br/>
 	<br/>
