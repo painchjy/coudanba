@@ -9,7 +9,8 @@ import shlex
 import re
 from jsonfield import JSONField
 from json.decoder import JSONDecodeError
-from lists.models import Item  as ListItem
+from lists.models import Item  as ListItem 
+from django.apps import apps
 STATUS_CHOICES = (
     ('testing','测试'),
     ('active','开始'),
@@ -36,6 +37,25 @@ class Location(models.Model):
         return self.ju_set.count()
     def lists_counts(self):
         return sum([ju.list_set.count() for ju in self.ju_set.all()])
+    def user_counts(self):
+        lu_counts = self.locationuser_set.exclude(
+            user__depart_name=self.locationdepart_set.all().values('depart_name')
+        ).count()
+        User = apps.get_model('accounts', 'User')
+        ld_user_counts = User.objects.filter(
+            depart_name__in=LocationDepart.objects.filter(location=self).values('depart_name')
+        ).count()
+        return lu_counts + ld_user_counts
+    def active_user_counts(self):
+        lu_counts = self.locationuser_set.exclude(
+            user__depart_name=self.locationdepart_set.all().values('depart_name')
+        ).count()
+        User = apps.get_model('accounts', 'User')
+        Token = apps.get_model('accounts', 'Token')
+        ld_user_counts = User.objects.filter(
+            depart_name__in=LocationDepart.objects.filter(location=self).values('depart_name')
+        ).filter(email__in=Token.objects.values('email').distinct()).count()
+        return lu_counts + ld_user_counts
 
 class LocationDepart(models.Model):
     location = models.ForeignKey(Location, blank=True, null=True)

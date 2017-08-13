@@ -1,6 +1,7 @@
 from django.contrib import auth
 from django.db import models
-from jus.models import Ju,Location, LocationDepart, LocationUser
+# from jus.models import Ju,Location, LocationDepart, LocationUser
+from django.apps import apps
 import uuid
 
 auth.signals.user_logged_in.disconnect(auth.models.update_last_login)
@@ -20,6 +21,9 @@ class User(models.Model):
             return True
         return False
     def prefered_locations(self):
+        Location = apps.get_model('jus','Location')
+        LocationDepart = apps.get_model('jus','LocationDepart')
+        LocationUser = apps.get_model('jus','LocationUser')
         return Location.objects.filter(
             id__in=LocationDepart.objects.filter(
             depart_name=self.depart_name
@@ -28,6 +32,7 @@ class User(models.Model):
         ))
         
     def closed_jus(self, ju_type=None):
+        Ju = apps.get_model('jus','Ju')
         if ju_type:
             return Ju.objects.filter(
                 id__in=self.lists_owned.all().values_list('ju'),
@@ -39,6 +44,7 @@ class User(models.Model):
             status='close'
         )
     def active_jus(self, ju_type=None):
+        Ju = apps.get_model('jus','Ju')
         if ju_type:
             return Ju.active_jus(ju_type=ju_type, locations=self.prefered_locations())
         return Ju.active_jus(locations=self.prefered_locations())
@@ -52,6 +58,7 @@ class User(models.Model):
         return self.ju_set.exclude(ju_type='category')
 
     def active_ju(self, ju_type=None):
+        Ju = apps.get_model('jus','Ju')
         if ju_type:
             return Ju.active_ju(ju_type=ju_type, locations=self.prefered_locations())
         return Ju.active_ju(locations=self.prefered_locations())
