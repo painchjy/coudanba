@@ -20,9 +20,6 @@ def check(request):
         check_signature(WECHAT_TOKEN, signature, timestamp, nonce)
     except InvalidSignatureException:
         # 处理异常情况或忽略
-        print('>>> {},{}'.format(request.GET, '验证异常'))
-        # return '验证异常'
         return 'Shutting down...'
     else:
-        print('>>> {},{}'.format(request.GET, '验证ok'))
         return HttpResponse(echostr)
