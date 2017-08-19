@@ -6,6 +6,7 @@ Restart=on-failure
 User=painchjy
 WorkingDirectory=/home/painchjy/sites/SITENAME/source
 Environment=EMAIL_PASSWORD=SEKRIT
+Environment=WECHAT_TOKEN=TOKEN
 ExecStart=/home/painchjy/sites/SITENAME/virtualenv/bin/gunicorn \
     --bind unix:/tmp/SITENAME.socket \
     --access-logfile ../access.log \

@@ -8,9 +8,10 @@ from django.conf import settings
 from django.http import HttpResponse
 from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException
+import os
 
-WECHAT_TOKEN = 'testwechatbyzjh'
-def check(request):
+WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
+def interface(request):
     signature = request.GET.get('signature', '')
     timestamp = request.GET.get('timestamp', '')
     nonce = request.GET.get('nonce', '')
