@@ -16,7 +16,7 @@ WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
 #AES_KEY = os.environ.get('AES_KEY')
 #APPID = os.environ.get('APPID')
 def interface(request):
-    if request.method='GET':
+    if request.method == 'GET':
         return get(request)
     else:
         return post(request)
