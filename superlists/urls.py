@@ -19,10 +19,12 @@ from lists import views as list_views
 from lists import urls as list_urls
 from jus import urls as ju_urls
 from accounts import urls as account_urls
+from wechat import urls as wechat_urls
 
 urlpatterns = [
     url(r'^$',list_views.home_page, name='home' ),
     url(r'^lists/', include(list_urls) ),
     url(r'^jus/', include(ju_urls) ),
     url(r'^accounts/', include(account_urls) ),
+    url(r'^wechat/', include(wechat_urls) ),
 ]

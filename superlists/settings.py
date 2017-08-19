@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'accounts',
     'jus',
     'functional_tests',
+    'wechat',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

@@ -13,6 +13,7 @@ class List(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='lists_owned')
     agent = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='lists_agented')
     ju = models.ForeignKey('jus.Ju', blank=True, null=True)
+    text = models.CharField(default='', max_length=140)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
