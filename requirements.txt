@@ -2,5 +2,5 @@ Django==1.11rc1
 gunicorn==19.7.1
 jsonfield==2.0.2
 xmltodict==0.11.0
-cryptography==1.8.1
+cryptography==2.0.3
 wechatpy==1.5.1
