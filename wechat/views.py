@@ -17,44 +17,56 @@ from wechatpy.replies import TextReply
 from django.views.decorators.csrf import csrf_exempt
 
 WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
-#AES_KEY = os.environ.get('AES_KEY')
-#APPID = os.environ.get('APPID')
+AES_KEY = os.environ.get('WECHAT_AES_KEY')
+APPID = os.environ.get('WECHAT_APPID')
+SECRET = os.environ.get('WECHAT_SECRET')
 @csrf_exempt
 def interface(request):
-    log.debug('>>> {},{}'.format(request.GET, request.POST))
-    if request.method == 'GET':
-        return get(request)
-    else:
-        return post(request)
-def post(request):
-    signature = request.GET.get('signature', '')
-    timestamp = request.GET.get('timestamp', '')
-    nonce = request.GET.get('nonce', '')
-
-    try:
-        check_signature(WECHAT_TOKEN, signature, timestamp, nonce)
-    except InvalidSignatureException:
-        # 处理异常情况或忽略
-        #print('>>> {},{}'.format(request.args, '验证异常'))
-        # return '验证异常'
-        return 'Shutting down...'
-    msg_signature = request.POST.get('msg_signature', '')
-    encrypt_type = request.POST.get('encrypt_type', '')
-    request_msg = parse_message(request.POST)
-    log.debug('>>> {},{}'.format(request.GET, request.POST))
-    reply = TextReply(content='text', message=request_msg)
-    return reply.render()
-
-def get(request):
     signature = request.GET.get('signature', '')
     timestamp = request.GET.get('timestamp', '')
     nonce = request.GET.get('nonce', '')
     echostr = request.GET.get('echostr', '')
-
     try:
         check_signature(WECHAT_TOKEN, signature, timestamp, nonce)
     except InvalidSignatureException:
         # 处理异常情况或忽略
-        return 'Shutting down...'
-    else:
+        log.error('>>> get:{},body:{}'.format(request.GET, request.body))
+        return HttpResponse('')
+    if request.method == 'GET':
         return HttpResponse(echostr)
+
+
+    # 处理POST请求
+    msg_signature = request.GET.get('msg_signature', '')
+    encrypt_type = request.GET.get('encrypt_type', '')
+    if encrypt_type == 'aes':
+        crypto = WeChatCrypto(WECHAT_TOKEN, AES_KEY, APPID)
+        try:
+            decrypted_xml = crypto.decrypt_message(
+                request.body,
+                msg_signature,
+                timestamp,
+                nonce
+            )
+        except (InvalidAppIdException, InvalidSignatureException):
+            # to-do: 处理异常或忽略
+            log.error('>>> Decrypt message exception,get:{},body:{}'.format(request.GET, request.body))
+            return HttpResponse('Decrypt message exception')
+
+        xml = response_message(decrypted_xml)
+        encrypted_xml = crypto.encrypt_message(xml, nonce, timestamp)
+        response = HttpResponse(encrypted_xml, content_type="application/xml")
+        return response
+    else:
+        # 纯文本方式
+        xml = response_message(request.body)
+        response = HttpResponse(xml, content_type="application/xml")
+        return response
+
+def response_message(xml):
+    msg = parse_message(xml)
+    reply = TextReply(content=msg.content, message=msg)
+    # response = HttpResponse(reply.render(), content_type="application/xml")
+    # log.debug('>>> response:{}'.format(response))
+    return reply.render()
+

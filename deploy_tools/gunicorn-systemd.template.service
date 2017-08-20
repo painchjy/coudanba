@@ -7,6 +7,9 @@ User=painchjy
 WorkingDirectory=/home/painchjy/sites/SITENAME/source
 Environment=EMAIL_PASSWORD=SEKRIT
 Environment=WECHAT_TOKEN=TOKEN
+Environment=WECHAT_AES_KEY=AES_KEY
+Environment=WECHAT_APPID=APPID
+Environment=WECHAT_SECRET=SECRET
 ExecStart=/home/painchjy/sites/SITENAME/virtualenv/bin/gunicorn \
     --bind unix:/tmp/SITENAME.socket \
     --access-logfile ../access.log \
