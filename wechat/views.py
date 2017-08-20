@@ -15,6 +15,7 @@ from wechatpy.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
 from wechatpy.replies import TextReply
 from django.views.decorators.csrf import csrf_exempt
+from wechatpy import WeChatClient
 
 WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
 AES_KEY = os.environ.get('WECHAT_AES_KEY')
@@ -40,6 +41,7 @@ def interface(request):
     msg_signature = request.GET.get('msg_signature', '')
     encrypt_type = request.GET.get('encrypt_type', '')
     if encrypt_type == 'aes':
+        # 密文请求
         crypto = WeChatCrypto(WECHAT_TOKEN, AES_KEY, APPID)
         try:
             decrypted_xml = crypto.decrypt_message(
@@ -58,15 +60,20 @@ def interface(request):
         response = HttpResponse(encrypted_xml, content_type="application/xml")
         return response
     else:
-        # 纯文本方式
+        # 明文请求
         xml = response_message(request.body)
         response = HttpResponse(xml, content_type="application/xml")
         return response
 
 def response_message(xml):
     msg = parse_message(xml)
+    client = WeChatClient(APP_ID, SERET)
+    user = client.user.get('opj8uwus6Flhf5G-KujGPNDHNbJI')
+    client.message.send_text('opj8uwus6Flhf5G-KujGPNDHNbJI', 'user:{}'.format(user))
+    log.debug('>>> user:{}'.format(user))
     reply = TextReply(content=msg.content, message=msg)
     # response = HttpResponse(reply.render(), content_type="application/xml")
+    
     # log.debug('>>> response:{}'.format(response))
     return reply.render()
 

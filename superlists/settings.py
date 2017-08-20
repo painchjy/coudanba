@@ -153,7 +153,7 @@ LOGGING = {
             'class': 'logging.StreamHandler',
         },
         'gunicorn': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'verbose',
             'filename': '../debug.log',
