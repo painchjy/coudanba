@@ -67,7 +67,7 @@ def interface(request):
 
 def response_message(xml):
     msg = parse_message(xml)
-    client = WeChatClient(APP_ID, SERET)
+    client = WeChatClient(APPID, SERET)
     user = client.user.get('opj8uwus6Flhf5G-KujGPNDHNbJI')
     client.message.send_text('opj8uwus6Flhf5G-KujGPNDHNbJI', 'user:{}'.format(user))
     log.debug('>>> user:{}'.format(user))
