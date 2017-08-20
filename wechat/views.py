@@ -1,3 +1,5 @@
+import logging
+log = logging.getLogger('django')
 from django.shortcuts import render
 from datetime import datetime
 import hashlib
@@ -19,6 +21,7 @@ WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
 #APPID = os.environ.get('APPID')
 @csrf_exempt
 def interface(request):
+    log.debug('>>> {},{}'.format(request.GET, request.POST))
     if request.method == 'GET':
         return get(request)
     else:
@@ -38,7 +41,7 @@ def post(request):
     msg_signature = request.POST.get('msg_signature', '')
     encrypt_type = request.POST.get('encrypt_type', '')
     request_msg = parse_message(request.POST)
-    print('>>> {},{}'.format(request.GET, request.POST))
+    log.debug('>>> {},{}'.format(request.GET, request.POST))
     reply = TextReply(content='text', message=request_msg)
     return reply.render()
 

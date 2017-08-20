@@ -142,16 +142,29 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s'
+        }
+    },
     'handlers': {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
-     },
-     'loggers': {
-         'django': {
-             'handlers': ['console'],
-         },
-     },
-     'root': {'level': 'INFO'},
+        'gunicorn': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'verbose',
+            'filename': '../debug.log',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console','gunicorn'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
 }
