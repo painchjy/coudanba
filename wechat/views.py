@@ -70,7 +70,7 @@ def response_message(xml, request=None):
     fromUserName = msg.source
     toUserName = msg.target
     log.debug('>>> source:{},target:{},openid:{}, msg:{}'.format(fromUserName, toUserName,request.GET.get('openid'), msg))
-    client = WeChatClient(APPID, SERET)
+    client = WeChatClient(APPID, SECRET)
     # user = client.user.get('opj8uwus6Flhf5G-KujGPNDHNbJI')
     client.message.send_text(request.GET.get('openid'), 'user:{}'.format(user))
     log.debug('>>> user:{}'.format(user))
