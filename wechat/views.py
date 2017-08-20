@@ -55,23 +55,27 @@ def interface(request):
             log.error('>>> Decrypt message exception,get:{},body:{}'.format(request.GET, request.body))
             return HttpResponse('Decrypt message exception')
 
-        xml = response_message(decrypted_xml)
+        xml = response_message(decrypted_xml, request)
         encrypted_xml = crypto.encrypt_message(xml, nonce, timestamp)
         response = HttpResponse(encrypted_xml, content_type="application/xml")
         return response
     else:
         # 明文请求
-        xml = response_message(request.body)
+        xml = response_message(request.body, request)
         response = HttpResponse(xml, content_type="application/xml")
         return response
 
-def response_message(xml):
+def response_message(xml, request=None):
     msg = parse_message(xml)
+    fromUserName = msg.source
+    toUserName = msg.target
+    log.debug('>>> source:{},target:{},openid:{}, msg:{}'.format(fromUserName, toUserName,request.GET.get('openid'), msg))
     client = WeChatClient(APPID, SERET)
-    user = client.user.get('opj8uwus6Flhf5G-KujGPNDHNbJI')
-    client.message.send_text('opj8uwus6Flhf5G-KujGPNDHNbJI', 'user:{}'.format(user))
+    # user = client.user.get('opj8uwus6Flhf5G-KujGPNDHNbJI')
+    client.message.send_text(request.GET.get('openid'), 'user:{}'.format(user))
     log.debug('>>> user:{}'.format(user))
     reply = TextReply(content=msg.content, message=msg)
+    reply.target = msg.source
     # response = HttpResponse(reply.render(), content_type="application/xml")
     
     # log.debug('>>> response:{}'.format(response))
