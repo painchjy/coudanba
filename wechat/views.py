@@ -9,13 +9,12 @@ from django.core.cache import caches
 from django.conf import settings
 from django.http import HttpResponse
 import os
-from wechatpy import parse_message
-from wechatpy.utils import check_signature
+from wechatpy.utils import check_signature, WeChatSigner
 from wechatpy.enterprise.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
 from wechatpy.replies import TextReply
 from django.views.decorators.csrf import csrf_exempt
-from wechatpy.enterprise import WeChatClient
+from wechatpy.enterprise import WeChatClient,parse_message
 from wechatpy.enterprise.exceptions import InvalidCorpIdException
 
 WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
@@ -32,6 +31,9 @@ def interface(request):
     echostr = request.GET.get('echostr', '')
     crypto = WeChatCrypto(WECHAT_TOKEN, AES_KEY, APPID)
     try:
+        signer = WeChatSigner()
+        signer.add_data(WECHAT_TOKEN, timestamp, nonce)
+        log.debug('>>> Signatrue:{},get:{},body:{}'.format(signer.signature, request.GET, request.body))
         if echostr:
             echostr = crypto.check_signature(
                 signature,
@@ -40,12 +42,13 @@ def interface(request):
                 echostr
             )
         else:
-            check_signature(
-                WECHAT_TOKEN,
-                signature,
-                timestamp,
-                nonce
-            )
+            pass
+            # check_signature(
+            #     WECHAT_TOKEN,
+            #     signature,
+            #     timestamp,
+            #     nonce
+            # )
 
     except InvalidSignatureException as e:
         log.error('>>> SignatrueException:{},get:{},body:{}'.format(e, request.GET, request.body))
@@ -82,13 +85,13 @@ def response_message(xml, request=None):
     toUserName = msg.target
     log.debug('>>> source:{},target:{},openid:{}, msg:{}'.format(fromUserName, toUserName,request.GET.get('openid'), msg))
     client = WeChatClient(APPID, SECRET)
-    # user = client.user.get('opj8uwus6Flhf5G-KujGPNDHNbJI')
-    # client.message.send_text(request.GET.get('openid'), 'user:{}'.format(user))
     # log.debug('>>> user:{}'.format(user))
     reply = TextReply(content=msg.content, message=msg)
     # reply.target = msg.source
     # response = HttpResponse(reply.render(), content_type="application/xml")
     
     # log.debug('>>> response:{}'.format(response))
+    user = client.user.get(msg.source)
+    client.message.send_text( msg.agent ,msg.source, 'user:{}'.format(user))
     return reply.render()
 
