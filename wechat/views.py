@@ -3,7 +3,8 @@ log = logging.getLogger('django')
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from datetime import datetime
-from accounts.models import Token
+from accounts.models import Token, User
+from wechat.models import Requirement
 import hashlib
 import json
 import xmltodict
@@ -88,23 +89,24 @@ def response_message(xml, request=None):
     log.debug('>>> source:{},target:{},openid:{}, msg:{}'.format(fromUserName, toUserName,request.GET.get('openid'), msg))
     client = WeChatClient(APPID, SECRET)
     user = client.user.get(msg.source)
+    userpk = user.get('email') or user.get('userid')
     # client.message.send_text( msg.agent ,msg.source, 'user:{}'.format(user))
     # log.debug('>>> user:{}'.format(user))
     if msg.type == 'text':
+        if re.match(r'.*(想)|(建议)',msg.content):
+            Requirement.objects.get_or_create(email=userpk,content=msg.content)
+            req_counts = Requirement.objects.filter(email=userpk).count()
+            reply = TextReply(content='您的想法和建议我们已经收到（{}）'.format(req_counts), message=msg)
+
         reply = TextReply(content=msg.content, message=msg)
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
         if msg.event == 'click' and msg.key == 'login':
-            email = user.get('email')
-            if email:
-                token = Token.objects.filter(email=email).first()
-                if not token:
-                    token = Token.objects.create(email=email)
-                url = request.build_absolute_uri(
-                    reverse('login') + '?token=' + str(token.uid)
-                )
-            else:
-                url = '请让管理员设置号您的email后再登'
+            User.objects.get_or_create(email=userpk, defaults={display_name: user.get('name')})
+            token = Token.objects.get_or_create(email=userpk)
+            url = request.build_absolute_uri(
+                reverse('login') + '?token=' + str(token.uid)
+            )
             reply = TextReply(content=url, message=msg)
     return reply.render()
 
