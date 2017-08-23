@@ -10,60 +10,62 @@ from django.conf import settings
 from django.http import HttpResponse
 import os
 from wechatpy import parse_message
-from wechatpy.utils import check_signature
-from wechatpy.crypto import WeChatCrypto
+# from wechatpy.utils import check_signature
+from wechatpy.enterprise.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
 from wechatpy.replies import TextReply
 from django.views.decorators.csrf import csrf_exempt
-from wechatpy import WeChatClient
+from wechatpy.enterprise import WeChatClient
+from wechatpy.enterprise.exceptions import InvalidCorpIdException
 
 WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
 AES_KEY = os.environ.get('WECHAT_AES_KEY')
 APPID = os.environ.get('WECHAT_APPID')
 SECRET = os.environ.get('WECHAT_SECRET')
+AGENTID = os.environ.get('AGENTID')
 @csrf_exempt
 def interface(request):
-    signature = request.GET.get('signature', '')
+    msg_signature = request.GET.get('msg_signature', '')
+    signature = request.GET.get('signature', msg_signature)
     timestamp = request.GET.get('timestamp', '')
     nonce = request.GET.get('nonce', '')
     echostr = request.GET.get('echostr', '')
+    crypto = WeChatCrypto(WECHAT_TOKEN, AESKEY, APPID)
     try:
-        check_signature(WECHAT_TOKEN, signature, timestamp, nonce)
-    except InvalidSignatureException:
-        # 处理异常情况或忽略
-        log.error('>>> get:{},body:{}'.format(request.GET, request.body))
+        echostr = crypto.check_signature(
+            signature,
+            timestamp,
+            nonce,
+            echostr
+        )
+    except InvalidSignatureException as e:
+        log.error('>>> SignatrueException:{},get:{},body:{}'.format(e, request.GET, request.body))
         return HttpResponse('')
     if request.method == 'GET':
         return HttpResponse(echostr)
 
 
     # 处理POST请求
-    msg_signature = request.GET.get('msg_signature', '')
-    encrypt_type = request.GET.get('encrypt_type', '')
-    if encrypt_type == 'aes':
-        # 密文请求
-        crypto = WeChatCrypto(WECHAT_TOKEN, AES_KEY, APPID)
-        try:
-            decrypted_xml = crypto.decrypt_message(
-                request.body,
-                msg_signature,
-                timestamp,
-                nonce
-            )
-        except (InvalidAppIdException, InvalidSignatureException):
-            # to-do: 处理异常或忽略
-            log.error('>>> Decrypt message exception,get:{},body:{}'.format(request.GET, request.body))
-            return HttpResponse('Decrypt message exception')
+    try:
+        decrypted_xml = crypto.decrypt_message(
+            request.body,
+            msg_signature,
+            timestamp,
+            nonce
+        )
+    except (InvalidCorpIdException, InvalidSignatureException):
+        # to-do: 处理异常或忽略
+        log.error('>>> Decrypt message exception,get:{},body:{}'.format(request.GET, request.body))
+        return HttpResponse('Decrypt message exception')
 
-        xml = response_message(decrypted_xml, request)
-        encrypted_xml = crypto.encrypt_message(xml, nonce, timestamp)
-        response = HttpResponse(encrypted_xml, content_type="application/xml")
-        return response
-    else:
-        # 明文请求
-        xml = response_message(request.body, request)
-        response = HttpResponse(xml, content_type="application/xml")
-        return response
+    xml = response_message(decrypted_xml, request)
+    encrypted_xml = crypto.encrypt_message(xml, nonce, timestamp)
+    response = HttpResponse(encrypted_xml, content_type="application/xml")
+    return response
+    # 明文请求
+    # xml = response_message(request.body, request)
+    # response = HttpResponse(xml, content_type="application/xml")
+    # return response
 
 def response_message(xml, request=None):
     msg = parse_message(xml)
@@ -72,10 +74,10 @@ def response_message(xml, request=None):
     log.debug('>>> source:{},target:{},openid:{}, msg:{}'.format(fromUserName, toUserName,request.GET.get('openid'), msg))
     client = WeChatClient(APPID, SECRET)
     # user = client.user.get('opj8uwus6Flhf5G-KujGPNDHNbJI')
-    client.message.send_text(request.GET.get('openid'), 'user:{}'.format(user))
-    log.debug('>>> user:{}'.format(user))
+    # client.message.send_text(request.GET.get('openid'), 'user:{}'.format(user))
+    # log.debug('>>> user:{}'.format(user))
     reply = TextReply(content=msg.content, message=msg)
-    reply.target = msg.source
+    # reply.target = msg.source
     # response = HttpResponse(reply.render(), content_type="application/xml")
     
     # log.debug('>>> response:{}'.format(response))
