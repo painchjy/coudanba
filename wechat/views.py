@@ -97,7 +97,7 @@ def response_message(xml, request=None):
         if msg.event == 'click' and msg.key == 'login':
             email = user.get('email')
             if email:
-                token = Token.objets.filter(email=email).first()
+                token = Token.objects.filter(email=email).first()
                 if not token:
                     token = Token.objects.create(email=email)
                 url = request.build_absolute_uri(
