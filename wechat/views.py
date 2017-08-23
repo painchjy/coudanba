@@ -11,7 +11,7 @@ import xmltodict
 from django.core.cache import caches
 from django.conf import settings
 from django.http import HttpResponse
-import os
+import os, re
 from wechatpy.utils import check_signature, WeChatSigner
 from wechatpy.enterprise.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
@@ -84,9 +84,7 @@ def interface(request):
 
 def response_message(xml, request=None):
     msg = parse_message(xml)
-    fromUserName = msg.source
-    toUserName = msg.target
-    log.debug('>>> source:{},target:{},openid:{}, msg:{}'.format(fromUserName, toUserName,request.GET.get('openid'), msg))
+    log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, msg))
     client = WeChatClient(APPID, SECRET)
     user = client.user.get(msg.source)
     userpk = user.get('email') or user.get('userid')
@@ -97,13 +95,15 @@ def response_message(xml, request=None):
             Requirement.objects.get_or_create(email=userpk,content=msg.content)
             req_counts = Requirement.objects.filter(email=userpk).count()
             reply = TextReply(content='您的想法和建议我们已经收到（{}）'.format(req_counts), message=msg)
-
+            return reply.render()
         reply = TextReply(content=msg.content, message=msg)
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
         if msg.event == 'click' and msg.key == 'login':
-            User.objects.get_or_create(email=userpk, defaults={display_name: user.get('name')})
-            token = Token.objects.get_or_create(email=userpk)
+            User.objects.get_or_create(email=userpk, defaults={'display_name': user.get('name')})
+            token = Token.objects.filter(email=userpk).first()
+            if not token:
+                token = Token.objects.create(email=userpk)
             url = request.build_absolute_uri(
                 reverse('login') + '?token=' + str(token.uid)
             )
