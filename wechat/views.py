@@ -10,7 +10,7 @@ from django.conf import settings
 from django.http import HttpResponse
 import os
 from wechatpy import parse_message
-# from wechatpy.utils import check_signature
+from wechatpy.utils import check_signature
 from wechatpy.enterprise.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
 from wechatpy.replies import TextReply
@@ -30,14 +30,23 @@ def interface(request):
     timestamp = request.GET.get('timestamp', '')
     nonce = request.GET.get('nonce', '')
     echostr = request.GET.get('echostr', '')
-    crypto = WeChatCrypto(WECHAT_TOKEN, AESKEY, APPID)
+    crypto = WeChatCrypto(WECHAT_TOKEN, AES_KEY, APPID)
     try:
-        echostr = crypto.check_signature(
-            signature,
-            timestamp,
-            nonce,
-            echostr
-        )
+        if echostr:
+            echostr = crypto.check_signature(
+                signature,
+                timestamp,
+                nonce,
+                echostr
+            )
+        else:
+            check_signature(
+                WECHAT_TOKEN,
+                signature,
+                timestamp,
+                nonce
+            )
+
     except InvalidSignatureException as e:
         log.error('>>> SignatrueException:{},get:{},body:{}'.format(e, request.GET, request.body))
         return HttpResponse('')
