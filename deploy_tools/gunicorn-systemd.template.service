@@ -10,6 +10,7 @@ Environment=WECHAT_TOKEN=TOKEN
 Environment=WECHAT_AES_KEY=AES_KEY
 Environment=WECHAT_APPID=APPID
 Environment=WECHAT_SECRET=SECRET
+Environment=WECHAT_AGENTID=AGENTID
 ExecStart=/home/painchjy/sites/SITENAME/virtualenv/bin/gunicorn \
     --bind unix:/tmp/SITENAME.socket \
     --access-logfile ../access.log \
