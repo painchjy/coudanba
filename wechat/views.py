@@ -95,10 +95,14 @@ def response_message(xml, request=None):
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
         if msg.event == 'click' and msg.key == 'login':
-            token = Token.objects.create(email=user.email)
-            url = request.build_absolute_uri(
-                reverse('login') + '?token=' + str(token.uid)
-            )
+            email = user.get('email')
+            if email:
+                token = Token.objects.create(email=user.email)
+                url = request.build_absolute_uri(
+                    reverse('login') + '?token=' + str(token.uid)
+                )
+            else:
+                url = '请让管理员设置号您的email后再登'
             reply = TextReply(content=url, message=msg)
     return reply.render()
 
