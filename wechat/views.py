@@ -107,6 +107,6 @@ def response_message(xml, request=None):
             url = request.build_absolute_uri(
                 reverse('login') + '?token=' + str(token.uid)
             )
-            reply = TextReply(content=url, message=msg)
+            reply = TextReply(content='第一次使用凑单吧，请点击下面的链接确认登录（在跳转页面顶部会显示您的姓名）\n\n'.format(url), message=msg)
     return reply.render()
 
