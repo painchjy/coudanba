@@ -163,7 +163,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console','gunicorn'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
     },

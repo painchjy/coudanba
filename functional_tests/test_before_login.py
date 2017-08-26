@@ -14,9 +14,10 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('凑单吧',self.browser.title)
         
         header_text = self.browser.find_element_by_tag_name('h4').text  
-        self.assertIn('自己凑', header_text)
+        self.assertIn('请扫码通过企业微信或关注微信企业号登录', header_text)
 
         
+    @skip
     def test_new_user_can_see_active_ju_but_can_not_new_orders(self):
         # edith has heard about a 凑单吧 site online. she goes
         # to check out its home page

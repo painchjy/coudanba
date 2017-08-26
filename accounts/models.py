@@ -11,6 +11,7 @@ class User(models.Model):
     depart_name = models.TextField(default='N/A')
     display_name = models.TextField(default='' )
     group_name = models.TextField(default='' )
+    avatar = models.TextField(default='' )
     REQUIRED_FIELDS = []
     USERNAME_FIELD = 'email'
     is_anonymous = False

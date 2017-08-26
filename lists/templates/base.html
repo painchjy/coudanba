@@ -12,16 +12,14 @@
 	<div class="container">
 	    <nav class="navbar navbar-default" role="navigation">
 		<div class="container-fluid">
-		    <a class="navbar-brand" href="/">凑单吧</a>
-		    {% if user.email %}
-		      <ul class="nav navbar-nav navbar-right">
-			<li class="navbar-text">群组：{{user.depart_name}} </li>
-			<li class="navbar-text">
-					账号： {{ user.display_name }} 
-			</li>
-			<li><a href="{% url 'user_invite' %}">邀请</a></li>
-			<li><a href="{% url 'logout' %}">注销</a></li>
-		      </ul>
+		    {% if user.is_authenticated %}
+		      <div class="nav navbar-left">
+		      <a href="/accounts/profile">
+		        <img src="{{user.avatar}}" style="height:38px;width:38px" class="img-rounded">
+		      </a>
+	                账号： {{ user.display_name }}@{{user.depart_name}} 
+		        <a href="{% url 'logout' %}">注销</a>
+		      </div>
 		    {% else %}
 		      <form class="navbar-form navbar-right" method="POST" action="{% url 'send_login_email' %}">
 			<span>请用邮箱登录:</span>

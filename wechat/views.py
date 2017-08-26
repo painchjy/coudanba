@@ -100,7 +100,19 @@ def response_message(xml, request=None):
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
         if msg.event == 'click' and msg.key == 'login':
-            User.objects.get_or_create(email=userpk, defaults={'display_name': user.get('name')})
+            dps = user.get('department')
+            if dps:
+                department = dps[0]
+            departments = client.department.get()
+            log.debug('>>> departments:{}'.format(departments))
+
+
+            User.objects.update_or_create(
+                email=userpk, 
+                defaults={
+                    'display_name': user.get('name'),
+                    'avatar': user.get('avatar'),
+            })
             token = Token.objects.filter(email=userpk).first()
             if not token:
                 token = Token.objects.create(email=userpk)
