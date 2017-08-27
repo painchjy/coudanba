@@ -16,6 +16,7 @@ from wechatpy.utils import check_signature, WeChatSigner
 from wechatpy.enterprise.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
 from wechatpy.replies import TextReply
+from wechatpy import create_reply
 from django.views.decorators.csrf import csrf_exempt
 from wechatpy.enterprise import WeChatClient,parse_message
 from wechatpy.enterprise.exceptions import InvalidCorpIdException
@@ -146,6 +147,8 @@ def response_message(xml, request=None):
                 message=msg
             )
 
+    else:
+        reply = create_reply('')
 
     return reply.render()
 
