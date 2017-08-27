@@ -76,8 +76,9 @@ def response_message(xml, request=None):
     msg = parse_message(xml)
     log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, msg))
     client = WeChatClient(APPID, SECRET)
-    user = client.user.get(msg.source)
-    userpk = user.get('email') or user.get('userid')
+    user_dict = client.user.get(msg.source)
+    userpk = user_dict.get('email') or user_dict.get('userid')
+    user = User.objects.filter(email=userpk).first()
     # client.message.send_text( msg.agent ,msg.source, 'user:{}'.format(user))
     # log.debug('>>> user:{}'.format(user))
     if msg.type == 'text':
@@ -91,10 +92,10 @@ def response_message(xml, request=None):
     elif msg.type == 'event':
         if msg.event == 'subscribe' or (msg.event == 'click' and msg.key == 'login'):
             defaults={
-                'display_name': user.get('name'),
-                'avatar': user.get('avatar'),
+                'display_name': user_dict.get('name'),
+                'avatar': user_dict.get('avatar'),
             }
-            user_depts = user.get('department')
+            user_depts = user_dict.get('department')
             log.debug('>>> user_depts:{}'.format(user_depts))
             if user_depts:
                 departments = client.department.get()
@@ -115,5 +116,24 @@ def response_message(xml, request=None):
                 content='如果尚未登录凑单吧，请点击下面的链接登录（在页面顶部将显示您的姓名和头像）\n{}'.format(url), 
                 message=msg
             )
+    elif msg.type == 'location':
+        if user:
+            location = { 
+                'user': user,
+                'latitude': msg.latitude,
+                'longitude': msg.longitude,
+                'precision': msg.precision,
+            }
+            reply = TextReply(
+                content='username:{},l:{},lo:{},p:{}'.format(
+                    user.display_name,
+                    msg.latitude,
+                    msg.longitude,
+                    msg.precision
+                ), 
+                message=msg
+            )
+
+
     return reply.render()
 

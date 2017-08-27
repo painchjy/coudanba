@@ -47,6 +47,8 @@ def send_login_email(request):
     return redirect('/')
 
 def user_invite(request):
+    if not request.user.is_authenticated:
+        return redirect('/')
     form = UserInviteForm()
     memo = '凑单吧用户{}邀请您加入{}一起凑单，活动内容可以用下面的链接登录查看。\n\n'
     form.fields['memo'].initial = memo.format(request.user.email, request.user.depart_name)
