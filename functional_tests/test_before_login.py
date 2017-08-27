@@ -14,7 +14,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('凑单吧',self.browser.title)
         
         header_text = self.browser.find_element_by_tag_name('h4').text  
-        self.assertIn('请扫码通过企业微信或关注微信企业号登录', header_text)
+        self.assertIn('请扫码关注微信企业号或使用企业微信登录', header_text)
 
         
     @skip
