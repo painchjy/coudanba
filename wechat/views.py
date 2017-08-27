@@ -89,7 +89,7 @@ def response_message(xml, request=None):
         reply = TextReply(content=msg.content, message=msg)
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
-        if msg.event == 'click' and msg.key == 'login':
+        if msg.event == 'subscribe' or (msg.event == 'click' and msg.key == 'login'):
             defaults={
                 'display_name': user.get('name'),
                 'avatar': user.get('avatar'),
@@ -112,7 +112,7 @@ def response_message(xml, request=None):
                 reverse('login') + '?token=' + str(token.uid)
             )
             reply = TextReply(
-                content='尚未登录凑单吧，请点击下面的链接确认登录（在跳转页面顶部会显示您的姓名）\n{}'.format(url), 
+                content='如果尚未登录凑单吧，请点击下面的链接登录（在页面顶部将显示您的姓名和头像）\n{}'.format(url), 
                 message=msg
             )
     return reply.render()
