@@ -14,3 +14,13 @@ class Location(models.Model):
     longitude = models.FloatField(null=False, blank=False)
     precision = models.FloatField(default=0, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class LocationHis(models.Model):
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    msgid = models.TextField(default='')
+    label = models.TextField(default='')
+    latitude = models.FloatField(null=False, blank=False)
+    longitude = models.FloatField(null=False, blank=False)
+    precision = models.FloatField(default=0, null=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)

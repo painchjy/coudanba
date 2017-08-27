@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from datetime import datetime
 from accounts.models import Token, User
-from wechat.models import Requirement
+from wechat.models import Requirement, Location, LocationHis
 import hashlib
 import json
 import xmltodict
@@ -20,6 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from wechatpy.enterprise import WeChatClient,parse_message
 from wechatpy.enterprise.exceptions import InvalidCorpIdException
 import geopy.distance
+from wechat.utils import timesince
 
 WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
 AES_KEY = os.environ.get('WECHAT_AES_KEY')
@@ -120,20 +121,23 @@ def response_message(xml, request=None):
     elif msg.type == 'location':
         if user:
             location = { 
+                'msgid': msg.id,
                 'user': user,
                 'latitude': msg.location_x,
                 'longitude': msg.location_y,
                 'precision': msg.scale,
                 'label': msg.label,
             }
-            Location.update_or_create(msgid=msg.id, defaults=location)
+            Location.objects.update_or_create(user=user, defaults=location)
+            LocationHis.objects.update_or_create(msgid=msg.id, defaults=location)
             content = ''
             coords_me = ( msg.location_x, msg.location_y)
-            for l in Location.objects.all():
-                content += '{},距离:{}km,label:{}'.format(
+            for l in Location.objects.all().order_by('-created_at'):
+                content += '\n{}{}在{},距离{:.3f}km'.format(
                     l.user.display_name,
+                    timesince(l.create_at),
+                    l.label,
                     geopy.distance.vincenty(coords_me,(l.latitude, l.longitude)).km,
-                    l.label
                 ) 
             log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, content))
 
