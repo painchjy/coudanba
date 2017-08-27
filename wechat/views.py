@@ -135,7 +135,7 @@ def response_message(xml, request=None):
             for l in Location.objects.all().order_by('-created_at'):
                 content += '\n{}{}在{},距离{:.3f}km'.format(
                     l.user.display_name,
-                    timesince(l.create_at),
+                    timesince(l.created_at),
                     l.label,
                     geopy.distance.vincenty(coords_me,(l.latitude, l.longitude)).km,
                 ) 
