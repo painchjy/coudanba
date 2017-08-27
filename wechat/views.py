@@ -77,7 +77,7 @@ def interface(request):
 
 def response_message(xml, request=None):
     msg = parse_message(xml)
-    log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, msg))
+    log.debug('>>> source:{},target:{}, msg.type:{}'.format(msg.source, msg.target, msg.type))
     client = WeChatClient(APPID, SECRET)
     user_dict = client.user.get(msg.source)
     userpk = user_dict.get('email') or user_dict.get('userid')
