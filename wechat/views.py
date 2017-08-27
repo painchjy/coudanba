@@ -91,6 +91,7 @@ def response_message(xml, request=None):
             reply = TextReply(content='您的想法和建议我们已经收到（{}）'.format(req_counts), message=msg)
             return reply.render()
         reply = TextReply(content=msg.content, message=msg)
+        return reply.render()
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
         if msg.event == 'subscribe' or (msg.event == 'click' and msg.key == 'login'):
@@ -119,6 +120,7 @@ def response_message(xml, request=None):
                 content='如果尚未登录凑单吧，请点击下面的链接登录（在页面顶部将显示您的姓名和头像）\n{}'.format(url), 
                 message=msg
             )
+            return reply.render()
     elif msg.type == 'location':
         if user:
             location = { 
@@ -146,9 +148,8 @@ def response_message(xml, request=None):
                 content='周围同事：'+content,
                 message=msg
             )
+            return reply.render()
 
-    else:
-        reply = create_reply('')
-
+    reply = create_reply('')
     return reply.render()
 
