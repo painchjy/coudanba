@@ -120,17 +120,21 @@ def response_message(xml, request=None):
         if user:
             location = { 
                 'user': user,
-                'latitude': msg.latitude,
-                'longitude': msg.longitude,
-                'precision': msg.precision,
+                'latitude': msg.location[0],
+                'longitude': msg.location[1],
+                # 'precision': msg.precision,
             }
+            content='username:{},l:{},lx:{},ly:{},label:{}'.format(
+                user.display_name,
+                msg.location,
+                msg.location_x,
+                msg.location_y,
+                msg.label
+            ) 
+            log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, content))
+
             reply = TextReply(
-                content='username:{},l:{},lo:{},p:{}'.format(
-                    user.display_name,
-                    msg.latitude,
-                    msg.longitude,
-                    msg.precision
-                ), 
+                content=content,
                 message=msg
             )
 
