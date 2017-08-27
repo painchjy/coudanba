@@ -100,7 +100,7 @@ def response_message(xml, request=None):
                 departments = client.department.get()
                 log.debug('>>> departments:{}'.format(departments))
                 if departments:
-                    department = next(d for d in departments if d.get('id') == dept_id))
+                    department = next((d for d in departments if d.get('id') == dept_id))
                     if department:
                         defaults.update({'depart_name': department.get('name')})
 
