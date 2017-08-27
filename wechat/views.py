@@ -33,30 +33,20 @@ def interface(request):
     nonce = request.GET.get('nonce', '')
     echostr = request.GET.get('echostr', '')
     crypto = WeChatCrypto(WECHAT_TOKEN, AES_KEY, APPID)
-    try:
+    if request.method == 'GET':
         signer = WeChatSigner()
         signer.add_data(WECHAT_TOKEN, timestamp, nonce)
         log.debug('>>> Signatrue:{},get:{},body:{}'.format(signer.signature, request.GET, request.body))
-        if echostr:
+        try:
             echostr = crypto.check_signature(
                 signature,
                 timestamp,
                 nonce,
                 echostr
             )
-        else:
-            pass
-            # check_signature(
-            #     WECHAT_TOKEN,
-            #     signature,
-            #     timestamp,
-            #     nonce
-            # )
-
-    except InvalidSignatureException as e:
-        log.error('>>> SignatrueException:{},get:{},body:{}'.format(e, request.GET, request.body))
-        return HttpResponse('')
-    if request.method == 'GET':
+        except InvalidSignatureException as e:
+            log.error('>>> SignatrueException:{},get:{},body:{}'.format(e, request.GET, request.body))
+            return HttpResponse('')
         return HttpResponse(echostr)
 
 
@@ -100,19 +90,21 @@ def response_message(xml, request=None):
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
         if msg.event == 'click' and msg.key == 'login':
-            dps = user.get('department')
-            if dps:
-                department = dps[0]
-            departments = client.department.get()
-            log.debug('>>> departments:{}'.format(departments))
+            defaults={
+                'display_name': user.get('name'),
+                'avatar': user.get('avatar'),
+            }
+            depts = user.get('department')
+            if depts:
+                dept_id = depts[0]
+                departments = client.department.get()
+                log.debug('>>> departments:{}'.format(departments))
+                if departments:
+                    department = next(d for d in departments if d.get('id') == dept_id))
+                    if department:
+                        defaults.update({'depart_name': department.get('name')})
 
-
-            User.objects.update_or_create(
-                email=userpk, 
-                defaults={
-                    'display_name': user.get('name'),
-                    'avatar': user.get('avatar'),
-            })
+            User.objects.update_or_create(email=userpk, defaults=defaults)
             token = Token.objects.filter(email=userpk).first()
             if not token:
                 token = Token.objects.create(email=userpk)
