@@ -1,6 +1,7 @@
 from datetime import datetime 
+import pytz
 def timesince(dt, default="现在"):
-    now = datetime.utcnow()
+    now = datetime.now(pytz.utc)
     diff = now - dt
     periods = (
         (diff.days / 365, "年"),
