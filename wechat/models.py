@@ -14,6 +14,7 @@ class Location(models.Model):
     longitude = models.FloatField(null=False, blank=False)
     precision = models.FloatField(default=0, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 class LocationHis(models.Model):
     
