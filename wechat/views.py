@@ -19,6 +19,7 @@ from wechatpy.replies import TextReply
 from django.views.decorators.csrf import csrf_exempt
 from wechatpy.enterprise import WeChatClient,parse_message
 from wechatpy.enterprise.exceptions import InvalidCorpIdException
+import geopy.distance
 
 WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
 AES_KEY = os.environ.get('WECHAT_AES_KEY')
@@ -120,21 +121,24 @@ def response_message(xml, request=None):
         if user:
             location = { 
                 'user': user,
-                'latitude': msg.location[0],
-                'longitude': msg.location[1],
-                # 'precision': msg.precision,
+                'latitude': msg.location_x,
+                'longitude': msg.location_y,
+                'precision': msg.scale,
+                'label': msg.label,
             }
-            content='username:{},l:{},lx:{},ly:{},label:{}'.format(
-                user.display_name,
-                msg.location,
-                msg.location_x,
-                msg.location_y,
-                msg.label
-            ) 
+            Location.update_or_create(msgid=msg.id, defaults=location)
+            content = ''
+            coords_me = ( msg.location_x, msg.location_y)
+            for l in Location.objects.all():
+                content += '{},距离:{}km,label:{}'.format(
+                    l.user.display_name,
+                    geopy.distance.vincenty(coords_me,(l.latitude, l.longitude)).km,
+                    l.label
+                ) 
             log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, content))
 
             reply = TextReply(
-                content=content,
+                content='周围同事：'+content,
                 message=msg
             )
 
