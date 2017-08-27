@@ -94,13 +94,13 @@ def response_message(xml, request=None):
                 'display_name': user.get('name'),
                 'avatar': user.get('avatar'),
             }
-            depts = user.get('department')
-            if depts:
-                dept_id = depts[0]
+            user_depts = user.get('department')
+            log.debug('>>> user_depts:{}'.format(user_depts))
+            if user_depts:
                 departments = client.department.get()
-                log.debug('>>> departments:{}'.format(departments))
+                log.debug('>>> departments_number:{}'.format(len(departments)))
                 if departments:
-                    department = next((d for d in departments if d.get('id') == dept_id))
+                    department = next((d for d in departments if d.get('id') in user_depts))
                     if department:
                         defaults.update({'depart_name': department.get('name')})
 
