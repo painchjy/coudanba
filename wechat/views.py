@@ -90,67 +90,80 @@ def response_message(xml, request=None):
             req_counts = Requirement.objects.filter(email=userpk).count()
             reply = TextReply(content='您的想法和建议我们已经收到（{}）'.format(req_counts), message=msg)
             return reply.render()
+        content = '''
+            现在我还不会聊天
+            但我会记录您提出的想法和建议
+            试着输入“...想...”或“...建议...”
+        '''
         reply = TextReply(content=msg.content, message=msg)
         return reply.render()
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
         log.debug('>>> msg.event:{}'.format( msg.event))
         if msg.event == 'subscribe' or (msg.event == 'click' and msg.key == 'login'):
-            defaults={
-                'display_name': user_dict.get('name'),
-                'avatar': user_dict.get('avatar'),
-            }
-            user_depts = user_dict.get('department')
-            log.debug('>>> user_depts:{}'.format(user_depts))
-            if user_depts:
-                departments = client.department.get()
-                log.debug('>>> departments_number:{}'.format(len(departments)))
-                if departments:
-                    department = next((d for d in departments if d.get('id') in user_depts))
-                    if department:
-                        defaults.update({'depart_name': department.get('name')})
+            return login_url(user_dict)
 
-            User.objects.update_or_create(email=userpk, defaults=defaults)
-            token = Token.objects.filter(email=userpk).first()
-            if not token:
-                token = Token.objects.create(email=userpk)
-            url = request.build_absolute_uri(
-                reverse('login') + '?token=' + str(token.uid)
-            )
-            reply = TextReply(
-                content='如果尚未登录凑单吧，请点击下面的链接登录（在页面顶部将显示您的姓名和头像）\n{}'.format(url), 
-                message=msg
-            )
-            return reply.render()
     elif msg.type == 'location':
-        if user:
-            location = { 
-                'msgid': msg.id,
-                'user': user,
-                'latitude': msg.location_x,
-                'longitude': msg.location_y,
-                'precision': msg.scale,
-                'label': msg.label,
-            }
-            Location.objects.update_or_create(user=user, defaults=location)
-            LocationHis.objects.update_or_create(msgid=msg.id, defaults=location)
-            content = ''
-            coords_me = ( msg.location_x, msg.location_y)
-            for l in Location.objects.all().order_by('-created_at'):
-                content += '\n{}{}在{},距离{:.3f}km'.format(
-                    l.user.display_name,
-                    timesince(l.updated_at),
-                    l.label,
-                    geopy.distance.vincenty(coords_me,(l.latitude, l.longitude)).km,
-                ) 
-            log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, content))
-
-            reply = TextReply(
-                content='周围同事：'+content,
-                message=msg
-            )
-            return reply.render()
+        return add_location(user, msg)
 
     reply = create_reply('')
     return reply.render()
 
+def add_location(user,msg):
+    if user:
+        location = { 
+            'msgid': msg.id,
+            'user': user,
+            'latitude': msg.location_x,
+            'longitude': msg.location_y,
+            'precision': msg.scale,
+            'label': msg.label,
+        }
+        Location.objects.update_or_create(user=user, defaults=location)
+        LocationHis.objects.update_or_create(msgid=msg.id, defaults=location)
+        content = ''
+        coords_me = ( msg.location_x, msg.location_y)
+        for l in Location.objects.all().order_by('-created_at'):
+            content += '\n{}{}在{},距离{:.3f}km'.format(
+                l.user.display_name,
+                timesince(l.updated_at),
+                l.label,
+                geopy.distance.vincenty(coords_me,(l.latitude, l.longitude)).km,
+            ) 
+        log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, content))
+
+        reply = TextReply(
+            content='周围同事：'+content,
+            message=msg
+        )
+        return reply.render()
+
+
+def login_url(user_dict):
+    defaults={
+        'display_name': user_dict.get('name'),
+        'avatar': user_dict.get('avatar'),
+    }
+    user_depts = user_dict.get('department')
+    log.debug('>>> user_depts:{}'.format(user_depts))
+    if user_depts:
+        departments = client.department.get()
+        log.debug('>>> departments_number:{}'.format(len(departments)))
+        if departments:
+            department = next((d for d in departments if d.get('id') in user_depts))
+            if department:
+                defaults.update({'depart_name': department.get('name')})
+
+    User.objects.update_or_create(email=userpk, defaults=defaults)
+    token = Token.objects.filter(email=userpk).first()
+    if not token:
+        token = Token.objects.create(email=userpk)
+    url = request.build_absolute_uri(
+        reverse('login') + '?token=' + str(token.uid)
+    )
+    reply = TextReply(
+        content='如果尚未登录凑单吧，请点击下面的链接登录（在页面顶部将显示您的姓名和头像）\n{}'.format(url), 
+        message=msg
+    )
+    return reply.render()
+ 
