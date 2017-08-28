@@ -102,30 +102,30 @@ def response_message(xml, request=None):
         if msg.event == 'subscribe': 
             return login_url(user_dict)
         if msg.event == 'location':
-            return add_location(user, msg)
+            return add_location(user, msg.id, msg.latitude, msg.longitude)
         if msg.event == 'click':
             if msg.key == 'login':
                 return login_url(user_dict)
             elif msg.key == 'get_available_cars':
                 return get_available_cars(user, msg)
     elif msg.type == 'location':
-        return add_location(user, msg)
+        return add_location(user, msg.id, msg.location_x, msg.location_y, msg.label)
 
     reply = create_reply('')
     return reply.render()
 
-def add_location(user,msg):
+def add_location(user,msgid,location_x,location_y,scale,label=''):
     if user:
         location = { 
-            'msgid': msg.id,
+            'msgid': msgid,
             'user': user,
-            'latitude': msg.location_x,
-            'longitude': msg.location_y,
-            'precision': msg.scale,
-            'label': msg.label,
+            'latitude': location_x,
+            'longitude': location_y,
+            'precision': scale,
+            'label': label,
         }
         Location.objects.update_or_create(user=user, defaults=location)
-        LocationHis.objects.get_or_create(msgid=msg.id, defaults=location)
+        LocationHis.objects.get_or_create(msgid=msgid, defaults=location)
     reply = create_reply('')
     return reply.render()
 
