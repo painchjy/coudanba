@@ -185,7 +185,7 @@ class WeChatRegistForm(forms.Form):
 class UserForm(forms.models.ModelForm):
     class Meta:
         model = User
-        fields = ['display_name','depart_name']
+        fields = ['display_name','depart_name','car_no','car_seats_left','telephone']
         widgets = {
             'display_name': forms.fields.TextInput(attrs={
                 'placeholder': '输入格式建议：昵称（移动短号）',
@@ -193,6 +193,18 @@ class UserForm(forms.models.ModelForm):
             }),
             'depart_name': forms.fields.TextInput(attrs={
                 'placeholder': '可以输入所属部门名称或自建群组名称',
+                'class': 'form-control input-md', 
+            }),
+            'car_no': forms.fields.TextInput(attrs={
+                'placeholder': '车牌号码，至少输入四位尾号',
+                'class': 'form-control input-md', 
+            }),
+            'car_seats_left': forms.fields.TextInput(attrs={
+                'placeholder': '0或大于0的整数',
+                'class': 'form-control input-md', 
+            }),
+            'telephone': forms.fields.TextInput(attrs={
+                'placeholder': '短号',
                 'class': 'form-control input-md', 
             }),
         }
@@ -203,6 +215,9 @@ class UserForm(forms.models.ModelForm):
         labels = {
                 'depart_name': '群组名称(缺省为部门名称，可以新建群组)',
                 'display_name': '账户名称',
+                'car_no': '车牌，至少输入四位尾号',
+                'car_seats_left': '可用座位数',
+                'telephone': '联系电话（短号）',
         }
     
 #    def __init__(self, *args, **kwargs):

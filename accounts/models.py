@@ -12,6 +12,9 @@ class User(models.Model):
     display_name = models.TextField(default='' )
     group_name = models.TextField(default='' )
     avatar = models.TextField(default='' )
+    car_no = models.CharField(default='' ,max_length=40, null=True, blank=True)
+    car_seats_left = models.FloatField(default=0 )
+    telephone = models.CharField(default='' ,max_length=40, null=True, blank=True)
     REQUIRED_FIELDS = []
     USERNAME_FIELD = 'email'
     is_anonymous = False

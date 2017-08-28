@@ -90,19 +90,24 @@ def response_message(xml, request=None):
             req_counts = Requirement.objects.filter(email=userpk).count()
             reply = TextReply(content='您的想法和建议我们已经收到（{}）'.format(req_counts), message=msg)
             return reply.render()
-        content = '''
-            现在我还不会聊天
-            但我会记录您提出的想法和建议
-            试着输入“...想...”或“...建议...”
-        '''
-        reply = TextReply(content=msg.content, message=msg)
+        content = '''现在我还不会聊天
+但我会记录您提出的想法和建议
+试着输入“...想...”或“...建议...” '''
+
+        reply = TextReply(content=content, message=msg)
         return reply.render()
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
         log.debug('>>> msg.event:{}'.format( msg.event))
-        if msg.event == 'subscribe' or (msg.event == 'click' and msg.key == 'login'):
+        if msg.event == 'subscribe': 
             return login_url(user_dict)
-
+        if msg.event == 'location':
+            return add_location(user, msg)
+        if msg.event == 'click':
+            if msg.key == 'login':
+                return login_url(user_dict)
+            elif msg.key == 'get_available_cars':
+                return get_available_cars(user, msg)
     elif msg.type == 'location':
         return add_location(user, msg)
 
@@ -120,23 +125,35 @@ def add_location(user,msg):
             'label': msg.label,
         }
         Location.objects.update_or_create(user=user, defaults=location)
-        LocationHis.objects.update_or_create(msgid=msg.id, defaults=location)
+        LocationHis.objects.get_or_create(msgid=msg.id, defaults=location)
+    reply = create_reply('')
+    return reply.render()
+
+def get_available_cars(user, msg):
+    if user:
+        my_location = Location.objects.filter(user=user)
         content = ''
-        coords_me = ( msg.location_x, msg.location_y)
-        for l in Location.objects.all().order_by('-created_at'):
-            content += '\n{}{}在{},距离{:.3f}km'.format(
+        coords_me = ( my_location.latitude, my_location.longitude)
+        for l in Location.objects.filter(user__car_seats_left__gt=0).order_by('-updated_at'):
+            content += '\n{}{}在{},距离{:.3f}km，车牌尾号:{}有{}个座位可用，联系电话{}'.format(
                 l.user.display_name,
                 timesince(l.updated_at),
                 l.label,
                 geopy.distance.vincenty(coords_me,(l.latitude, l.longitude)).km,
+                l.user.car_no[-4],
+                l.user.car_seats_left,
+                l.user.telephone
             ) 
         log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, content))
 
-        reply = TextReply(
-            content='周围同事：'+content,
-            message=msg
+        if not content:
+            content = '没有找到任何可用车辆信息'
+        reply = create_reply(
+            content='周围车辆：'+content,
         )
         return reply.render()
+    reply = create_reply('')
+    return reply.render()
 
 
 def login_url(user_dict):
