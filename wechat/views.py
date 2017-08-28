@@ -94,6 +94,7 @@ def response_message(xml, request=None):
         return reply.render()
         # log.debug('>>> response:{}'.format(response))
     elif msg.type == 'event':
+        log.debug('>>> msg.event:{}'.format( msg.event))
         if msg.event == 'subscribe' or (msg.event == 'click' and msg.key == 'login'):
             defaults={
                 'display_name': user_dict.get('name'),
