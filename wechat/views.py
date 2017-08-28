@@ -102,19 +102,19 @@ def response_message(xml, request=None):
         if msg.event == 'subscribe': 
             return login_url(user_dict)
         if msg.event == 'location':
-            return add_location(user, msg.id, msg.latitude, msg.longitude)
+            return add_location(user, msg.id, msg.latitude, msg.longitude, msg.precision )
         if msg.event == 'click':
             if msg.key == 'login':
                 return login_url(user_dict)
             elif msg.key == 'get_available_cars':
                 return get_available_cars(user, msg)
     elif msg.type == 'location':
-        return add_location(user, msg.id, msg.location_x, msg.location_y, msg.label)
+        return add_location(user, msg.id, msg.location_x, msg.location_y, msg.scale, msg.label)
 
     reply = create_reply('')
     return reply.render()
 
-def add_location(user,msgid,location_x,location_y,scale,label=''):
+def add_location(user, msgid, location_x, location_y, scale, label=''):
     if user:
         location = { 
             'msgid': msgid,
