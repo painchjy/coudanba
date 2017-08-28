@@ -131,7 +131,7 @@ def add_location(user, msgid, location_x, location_y, scale, label=''):
 
 def get_available_cars(user, msg):
     if user:
-        my_location = Location.objects.filter(user=user)
+        my_location = Location.objects.filter(user=user).order_by('-updated_at').first()
         content = ''
         coords_me = ( my_location.latitude, my_location.longitude)
         for l in Location.objects.filter(user__car_seats_left__gt=0).order_by('-updated_at'):
