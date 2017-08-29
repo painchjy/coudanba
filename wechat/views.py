@@ -178,9 +178,8 @@ def login_url(request, user_dict, client, userpk):
     url = request.build_absolute_uri(
         reverse('login') + '?token=' + str(token.uid)
     )
-    reply = TextReply(
+    reply = create_reply(
         content='如果尚未登录凑单吧，请点击下面的链接登录（在页面顶部将显示您的姓名和头像）\n{}'.format(url), 
-        message=msg
     )
     return reply.render()
  
