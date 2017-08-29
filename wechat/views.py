@@ -142,7 +142,7 @@ def get_location_his(user):
         coords_me = ( my_location.latitude, my_location.longitude)
         for l in LocationHis.objects.filter(user=user).order_by('-created_at')[:5]:
             content += '\n{}您在{:.3f}km{}'.format(
-                timesince(l.updated_at),
+                timesince(l.created_at),
                 geopy.distance.vincenty(coords_me,(l.latitude, l.longitude)).km,
                 l.label,
             ) 
