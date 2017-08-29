@@ -100,12 +100,12 @@ def response_message(xml, request=None):
     elif msg.type == 'event':
         log.debug('>>> msg.event:{}'.format( msg.event))
         if msg.event == 'subscribe': 
-            return login_url(user_dict, client, userpk)
+            return login_url(request, user_dict, client, userpk)
         if msg.event == 'location':
             return add_location(user, msg.id, msg.latitude, msg.longitude, msg.precision )
         if msg.event == 'click':
             if msg.key == 'login':
-                return login_url(user_dict, client, userpk)
+                return login_url(request, user_dict, client, userpk)
             elif msg.key == 'get_available_cars':
                 return get_available_cars(user, msg)
     elif msg.type == 'location':
@@ -156,7 +156,7 @@ def get_available_cars(user, msg):
     return reply.render()
 
 
-def login_url(user_dict, client, userpk):
+def login_url(request, user_dict, client, userpk):
     defaults={
         'display_name': user_dict.get('name'),
         'avatar': user_dict.get('avatar'),
