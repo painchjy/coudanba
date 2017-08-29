@@ -104,6 +104,7 @@ def response_message(xml, request=None):
         if msg.event == 'location':
             return add_location(user, msg.id, msg.latitude, msg.longitude, msg.precision )
         if msg.event == 'click':
+            log.debug('>>> msg.key:{}'.format( msg.key))
             if msg.key == 'login':
                 return login_url(request, user_dict, client, userpk)
             elif msg.key == 'get_available_cars':
@@ -126,6 +127,8 @@ def add_location(user, msgid, location_x, location_y, scale, label=''):
         }
         Location.objects.update_or_create(user=user, defaults=location)
         LocationHis.objects.get_or_create(msgid=msgid, defaults=location)
+        log.debug('>>> add location')
+        log.debug('>>> label:{},x:{},y{},s{}'.format(label, location_x, location_y,scale))
     reply = create_reply('')
     return reply.render()
 
@@ -135,16 +138,17 @@ def get_available_cars(user, msg):
         content = ''
         coords_me = ( my_location.latitude, my_location.longitude)
         for l in Location.objects.filter(user__car_seats_left__gt=0).order_by('-updated_at'):
-            content += '\n{}{}在{},距离{:.3f}km，车牌尾号:{}有{}个座位可用，联系电话{}'.format(
+            content += '\n{}{}距您{:.3f}km{}，车牌尾号:{}有{:.1f}个座位可用，联系电话{}'.format(
                 l.user.display_name,
                 timesince(l.updated_at),
-                l.label,
                 geopy.distance.vincenty(coords_me,(l.latitude, l.longitude)).km,
-                l.user.car_no[-4],
+                l.label,
+                l.user.car_no[-4:],
                 l.user.car_seats_left,
                 l.user.telephone
             ) 
-        log.debug('>>> source:{},target:{}, msg:{}'.format(msg.source, msg.target, content))
+        log.debug('>>> available cars')
+        log.debug('>>> reply content:{}'.format(content))
 
         if not content:
             content = '没有找到任何可用车辆信息'
