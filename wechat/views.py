@@ -149,7 +149,7 @@ def get_available_cars(user, msg):
         if not content:
             content = '没有找到任何可用车辆信息'
         reply = create_reply(
-            content='周围车辆：'+content,
+            '周围车辆：'+content
         )
         return reply.render()
     reply = create_reply('')
@@ -179,7 +179,7 @@ def login_url(request, user_dict, client, userpk):
         reverse('login') + '?token=' + str(token.uid)
     )
     reply = create_reply(
-        content='如果尚未登录凑单吧，请点击下面的链接登录（在页面顶部将显示您的姓名和头像）\n{}'.format(url), 
+        '如果尚未登录凑单吧，请点击下面的链接登录（在页面顶部将显示您的姓名和头像）\n{}'.format(url)
     )
     return reply.render()
  
