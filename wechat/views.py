@@ -129,7 +129,8 @@ def add_location(user, msgid, location_x, location_y, scale, label=''):
             'label': label,
         }
         Location.objects.update_or_create(user=user, defaults=location)
-        LocationHis.objects.get_or_create(msgid=msgid, defaults=location)
+        if msgid:
+            LocationHis.objects.get_or_create(msgid=msgid, defaults=location)
         log.debug('>>> add location')
         log.debug('>>> msgid:{},label_len:{},x:{},y{},s{}'.format(msgid, len(label), location_x, location_y,scale))
     reply = create_reply('')
