@@ -148,7 +148,7 @@ def get_available_cars(user, msg):
                 l.user.telephone
             ) 
         log.debug('>>> available cars')
-        log.debug('>>> reply content:{}'.format(content))
+        log.debug(content)
 
         if not content:
             content = '没有找到任何可用车辆信息'
