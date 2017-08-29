@@ -102,13 +102,16 @@ def response_message(xml, request=None):
         if msg.event == 'subscribe': 
             return login_url(request, user_dict, client, userpk)
         if msg.event == 'location':
+            log.debug('>>> msg:{}'.format( msg))
             return add_location(user, msg.id, msg.latitude, msg.longitude, msg.precision )
         if msg.event == 'click':
             log.debug('>>> msg.key:{}'.format( msg.key))
             if msg.key == 'login':
                 return login_url(request, user_dict, client, userpk)
             elif msg.key == 'get_available_cars':
-                return get_available_cars(user, msg)
+                return get_available_cars(user)
+            elif msg.key == 'my_location_his':
+                return get_location_his(user)
     elif msg.type == 'location':
         return add_location(user, msg.id, msg.location_x, msg.location_y, msg.scale, msg.label)
 
@@ -132,7 +135,27 @@ def add_location(user, msgid, location_x, location_y, scale, label=''):
     reply = create_reply('')
     return reply.render()
 
-def get_available_cars(user, msg):
+def get_location_his(user):
+    if user:
+        my_location = Location.objects.filter(user=user).order_by('-updated_at').first()
+        content = ''
+        coords_me = ( my_location.latitude, my_location.longitude)
+        for l in LocationHis.objects.filter(user=user).order_by('-updated_at')[:5]:
+            content += '\n{}您在{:.3f}km{}'.format(
+                timesince(l.updated_at),
+                geopy.distance.vincenty(coords_me,(l.latitude, l.longitude)).km,
+                l.label,
+            ) 
+        log.debug('>>> get_location_his')
+        log.debug(content)
+
+        reply = create_reply(content)
+        return reply.render()
+    reply = create_reply('')
+    return reply.render()
+
+
+def get_available_cars(user):
     if user:
         my_location = Location.objects.filter(user=user).order_by('-updated_at').first()
         content = ''
