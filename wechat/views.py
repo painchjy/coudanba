@@ -254,7 +254,7 @@ def login_url(request, user_dict, client, userpk):
         reverse('login') + '?token=' + str(token.uid)
     )
     reply = create_reply(
-        '如果尚未登录凑单吧，请点击下面的链接登录（在页面顶部将显示您的姓名和头像）\n{}'.format(url)
+        '如果通过凑单吧页面显示未登录，请点击下面的链接登录,也可以复制链接到浏览器。\n{}'.format(url)
     )
     return reply.render()
  

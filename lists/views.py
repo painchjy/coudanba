@@ -53,6 +53,7 @@ def next_category(request, ju_id):
 
     return category(request)
 
+@oauth
 def category(request):
     current_ju = Ju.active_ju(ju_type='category')
     return render(

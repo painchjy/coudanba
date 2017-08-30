@@ -4,6 +4,7 @@ from accounts.forms import EmailInputForm, UserInviteForm, UserForm, WeChatRegis
 from jus.models import Location
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from wechat.views import oauth
 User = get_user_model()
 
 
@@ -59,6 +60,7 @@ def user_invite(request):
             form.invite(request)
     return render(request, 'user_invite.html', { 'form': form, 'owner': request.user})
 
+@oauth
 def profile(request):
     form = UserForm(instance=request.user)
     if request.method == 'POST':
