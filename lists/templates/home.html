@@ -1,8 +1,10 @@
 {% extends 'list_base.html' %}
 {% block header_text %}
+{% if not request.user.is_authenticated %}
 请扫码关注微信企业号或使用企业微信登录
 <img src='http://p.qpic.cn/pic_wework/2567071692/484ef640315e5fe228cb44e9a9fae9b21190a142bd4de522/0' style="height:258px;width:258px" class="img-rounded">
 </br>
+{% endif %}
 {% if first_ju %}
 <a href='{% url 'order' first_ju.id%}' >
       看看别人在凑什么
@@ -11,12 +13,11 @@
 您关注的范围内没有活动，检查一下“设置”页，调整关注范围<br/>
 或者尝试
 {% endif %}
-    {% if request.user.is_authenticated %}
+{% if request.user.is_authenticated %}
     &nbsp<a href={% url 'new_ju' %}>发起活动</a> 
     &nbsp<a href={% url 'list_jus' %}>活动列表</a> 
-    {% endif %}
-	<br/>
-	<br/>
+{% endif %}
+<br/>
       自己凑个采购单！
 {% endblock %}
 {% block form_action %}{% url 'new_list' %}{% endblock %}
