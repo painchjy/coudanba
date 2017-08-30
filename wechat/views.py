@@ -35,7 +35,7 @@ def oauth(method):
     def warpper(request, *args, **kwargs):
         client = WeChatClient(APPID, SECRET)
         code = request.GET.get('code', None)
-        url = client.oauth.authorize_url(request.url)
+        url = client.oauth.authorize_url(request.build_absolute_uri())
         if not code:
             return method(request, *args, **kwargs)
         try:
