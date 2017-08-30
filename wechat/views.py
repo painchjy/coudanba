@@ -35,8 +35,8 @@ def oauth(method):
     def warpper(request, *args, **kwargs):
         client = WeChatClient(APPID, SECRET)
         code = request.GET.get('code', None)
-        url = client.oauth.authorize_url(request.build_absolute_uri())
-        log.debug('>>>auth get url:{} request.uri:{}'.format(url, request.build_absolute_uri()))
+        #url = client.oauth.authorize_url(request.build_absolute_uri())
+        #log.debug('>>>auth get url:{} request.uri:{}'.format(url, request.build_absolute_uri()))
         if not code:
             return method(request, *args, **kwargs)
         try:
@@ -64,12 +64,10 @@ def oauth(method):
             token = Token.objects.filter(email=userpk).first()
             if not token:
                 token = Token.objects.create(email=userpk)
-            user = auth.authenticate(uid=token)
+            user = auth.authenticate(uid=token.uid)
             log.debug('>>>auth user authenticated:{}'.format(user))
             if user:
                 auth.login(request, user)
-                log.debug('>>>auth user logged in:{}{}'.format(user,url))
-                return redirect(url)
 
         return method(request, *args, **kwargs)
 
