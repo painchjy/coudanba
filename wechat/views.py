@@ -2,6 +2,7 @@ import logging
 log = logging.getLogger('django')
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
+from django.contrib import auth
 from datetime import datetime
 from accounts.models import Token, User
 from wechat.models import Requirement, Location, LocationHis
@@ -31,22 +32,42 @@ SECRET = os.environ.get('WECHAT_SECRET')
 AGENTID = os.environ.get('AGENTID')
 def oauth(method):
     @functools.wraps(method)
-    def warpper(*args, **kwargs):
-        log.debug('>>>oauth args:{}'.format(args))
+    def warpper(request, *args, **kwargs):
         code = request.GET.get('code', None)
         # url = client.oauth.authorize_url(request.url)
+        if not code:
+            return method(request, *args, **kwargs)
+        try:
+            client = WeChatClient(APPID, SECRET)
+            user_info = client.oauth.get_user_info(code)
+            userid = user_info.get('UserId')
+            user_dict = client.user.get(userid)
+            userpk = user_dict.get('email') or user_dict.get('userid')
+            # user = User.objects.filter(email=userpk).first()
+        except Exception as e:
+            log.error('>>>Exception of oauth,errmsg:{},errcode:{}'.format(e.errmsg, e.errcode))
+            # 这里需要处理请求里包含的 code 无效的情况
+            return method(request, *args, **kwargs)
+        if not userpk:
+            return method(request, *args, **kwargs)
+        
+        if request.user.is_authenticated and request.user.email == userpk:
+            log.debug('>>>auth logged in already, user.email:{}'.format(userpk))
+            return method(request, *args, **kwargs)
+        else:
+            log.debug('>>>auth not login user_info:{}'.format(userpk))
+            user, created = User.objects.update_or_create(
+                email=userpk, 
+                defaults=weixin_user_to_model(user_dict, client)
+            )
+            token = Token.objects.filter(email=userpk).first()
+            if not token:
+                token = Token.objects.create(email=userpk)
+            user = auth.authenticate(uid=token)
+            if user:
+                auth.login(request, user)
 
-        if code:
-            try:
-                client = WeChatClient(APPID, SECRET)
-                user_info = client.oauth.get_user_info(code)
-            except Exception as e:
-                log.error('>>>Exception of oauth,errmsg:{},errcode:{}'.format(e.errmsg, e.errcode))
-                # 这里需要处理请求里包含的 code 无效的情况
-                abort(403)
-            else:
-                log.debug('>>>user_info:{}'.format(user_info))
-        return method(*args, **kwargs)
+        return method(request, *args, **kwargs)
 
     return warpper
 
@@ -206,7 +227,7 @@ def get_available_cars(user):
     return reply.render()
 
 
-def login_url(request, user_dict, client, userpk):
+def weixin_user_to_model(user_dict, client):
     defaults={
         'display_name': user_dict.get('name'),
         'avatar': user_dict.get('avatar'),
@@ -220,8 +241,10 @@ def login_url(request, user_dict, client, userpk):
             department = next((d for d in departments if d.get('id') in user_depts))
             if department:
                 defaults.update({'depart_name': department.get('name')})
+    return defaults
 
-    User.objects.update_or_create(email=userpk, defaults=defaults)
+def login_url(request, user_dict, client, userpk):
+    User.objects.update_or_create(email=userpk, defaults=weixin_user_to_model(user_dict, client))
     token = Token.objects.filter(email=userpk).first()
     if not token:
         token = Token.objects.create(email=userpk)
