@@ -33,12 +33,12 @@ AGENTID = os.environ.get('AGENTID')
 def oauth(method):
     @functools.wraps(method)
     def warpper(request, *args, **kwargs):
+        client = WeChatClient(APPID, SECRET)
         code = request.GET.get('code', None)
-        # url = client.oauth.authorize_url(request.url)
+        url = client.oauth.authorize_url(request.url)
         if not code:
             return method(request, *args, **kwargs)
         try:
-            client = WeChatClient(APPID, SECRET)
             user_info = client.oauth.get_user_info(code)
             userid = user_info.get('UserId')
             user_dict = client.user.get(userid)
@@ -66,6 +66,7 @@ def oauth(method):
             user = auth.authenticate(uid=token)
             if user:
                 auth.login(request, user)
+                return redirect(url)
 
         return method(request, *args, **kwargs)
 
