@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 import csv
+from wechat.views import oauth
 NEED_TO_LOGIN_ERROR = "别着急，先登录再凑单！"
 User = get_user_model()
 
@@ -144,7 +145,7 @@ def my_lists(request, email):
         return render(request, 'my_lists.html', {'owner': owner})
     except User.DoesNotExists:
         return redirect('/')
-
+@oauth
 def home_page(request):
     if request.user.is_authenticated:
         current_ju = request.user.active_ju()

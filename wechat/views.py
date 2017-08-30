@@ -22,12 +22,34 @@ from wechatpy.enterprise import WeChatClient,parse_message
 from wechatpy.enterprise.exceptions import InvalidCorpIdException
 import geopy.distance
 from wechat.utils import timesince
+import functools
 
 WECHAT_TOKEN = os.environ.get('WECHAT_TOKEN')
 AES_KEY = os.environ.get('WECHAT_AES_KEY')
 APPID = os.environ.get('WECHAT_APPID')
 SECRET = os.environ.get('WECHAT_SECRET')
 AGENTID = os.environ.get('AGENTID')
+def oauth(method):
+    @functools.wraps(method)
+    def warpper(*args, **kwargs):
+        log.debug('>>>oauth args:{}'.format(args))
+        code = request.GET.get('code', None)
+        # url = client.oauth.authorize_url(request.url)
+
+        if code:
+            try:
+                client = WeChatClient(APPID, SECRET)
+                user_info = client.oauth.get_user_info(code)
+            except Exception as e:
+                log.error('>>>Exception of oauth,errmsg:{},errcode:{}'.format(e.errmsg, e.errcode))
+                # 这里需要处理请求里包含的 code 无效的情况
+                abort(403)
+            else:
+                log.debug('>>>user_info:{}'.format(user_info))
+        return method(*args, **kwargs)
+
+    return warpper
+
 @csrf_exempt
 def interface(request):
     msg_signature = request.GET.get('msg_signature', '')
