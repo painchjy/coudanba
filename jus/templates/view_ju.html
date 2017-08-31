@@ -9,15 +9,14 @@
 {% block extra_content %}
     <table id="id_ju_order_list" class="table">
 	<tr>
-		<th>群组名称</th>
-		<th>账号</th>
+		<th style='text-align: center'>群组名称</th>
+		<th style='text-align: center'>账号</th>
 		{% for k,v in current_ju.sorted_items %}
-		<th>{{k}}:{{v.desc|slice:"0:8"}} </th>
+		<th style='text-align: right'>{{k}}:{{v.desc|slice:"0:8"}} </th>
 		{% endfor%}
-		<th>金额</th>
+		<th style='text-align: right'>金额</th>
 	</tr>
 	{% for list_ in current_ju.list_set.all %}
-	    {% if list_.owner.depart_name == user.depart_name %}
 	<tr>
 		<td style='text-align: center'>{{list_.owner.depart_name}}</td>
 		<td style='text-align: center'>{{list_.owner.display_name}}</td>
@@ -26,7 +25,6 @@
 		{% endfor%}
 		<td style='text-align: right'>{{list_.total_cost|floatformat:2}}</td>
 	</tr>
-	    {% endif %}
 	{% endfor %}
     </table>
 {% endblock %}

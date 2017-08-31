@@ -96,6 +96,7 @@ def view_ju(request, ju_id):
         form.fields['location'].queryset = ju.owner.prefered_locations()
         if form.is_valid():
             form.save(owner=request.user, ju=ju)
+    # jus_family_list_set = list(chain(ju.list_set.all(),[j.list_set.all() for j in ju.sub_jus.all()])
     return render(request, 'manage_ju.html', { 'current_ju': ju,  'form': form})
 
 def new_ju(request, p_id=None):

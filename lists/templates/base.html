@@ -100,6 +100,7 @@
     <table id="id_ju_table" class="table">
         <tr>
 		<th style='text-align: center;'>代号</th>
+		<th style='text-align: center;'></th>
 		<th style='text-align: center;'>说明</th>
 		<th style='text-align: center;'>单价</th>
 		<th style='text-align: center;'>子单数</th>
@@ -107,7 +108,13 @@
 	</tr>
     {% for k,v in current_ju.sorted_items %}
 	<tr>
-		<td style='text-align: left;'>{{ k }}</td>
+		<td style='text-align: left;'>{{ k }}
+		</td>
+		<td style='text-align: left;'>
+	{% if v.images %}
+	<a href="{{v.images.0}}"><img src="{{v.images.0}}" style="height:38px;"></a>
+    	{% endif %}
+		</td>
 		<td style='text-align: center;'>
 			{% if v.href %}
 			<a href="{{v.href}}" target="_blank">
@@ -116,11 +123,6 @@
 			{% else %}
 				{{ v.desc }}
 			{% endif %}
-	{% if v.images %}
-	{% for img in v.images %}
-	<a href="{{img}}"><img src="{{img}}" style="height:50px;"></a>
-    	{% endfor %}
-    	{% endif %}
 		</td>
 		<td style='text-align: right;'>{{ v.price|floatformat:2 }} </td>
 		<td style='text-align: right;'>{{ v.qty_sum|floatformat:2 }} </td>
