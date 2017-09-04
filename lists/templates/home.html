@@ -1,7 +1,8 @@
 {% extends 'list_base.html' %}
 {% block header_text %}
 {% if not request.user.is_authenticated %}
-请扫码关注微信企业号或使用企业微信登录
+请扫码关注微信企业号。</br>根据企业助手通知，填写手机或邮箱进行验证。</br>企业号会出现在通讯录顶部，除凑单外，如还想尝试更多功能，建议下载和安装企业微信。
+</br>
 <img src='http://p.qpic.cn/pic_wework/2567071692/484ef640315e5fe228cb44e9a9fae9b21190a142bd4de522/0' style="height:258px;width:258px" class="img-rounded">
 </br>
 {% endif %}
